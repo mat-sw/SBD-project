@@ -1,2 +1,3 @@
 # SBD-project
-## Autorzy: Julia Lamperska, Mateusz Świercz
+## Autorzy:
+Julia Lamperska, Mateusz Świercz
