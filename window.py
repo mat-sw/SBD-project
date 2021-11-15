@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets #, QtCore, QtGui
 # from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtCore import Qt
 from button import Button
 from label import Label
 from line_edit import Line_Edit
@@ -20,8 +21,8 @@ class Window(QtWidgets.QWidget):
         self.label = Label(rgb, self)
         self.label.setText(text)
         self.label.move(pos[0], pos[1])
-        self.label.setLineWidth(10)
-        self.label.setFrameStyle(10)
+        self.label.setLineWidth(50)
+        # self.label.setFrameStyle(10)
         # self.my_grid.addWidget(self.label)
 
     def add_button(self, text, pos, rgb):
@@ -34,3 +35,4 @@ class Window(QtWidgets.QWidget):
         self.line_edit.setText(text)
         # self.text_edit.resize(100, 25)
         self.line_edit.move(pos[0], pos[1])
+        # self.line_edit.setAlignment(Qt.AlignCenter) # alignment
