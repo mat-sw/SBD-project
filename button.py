@@ -1,4 +1,6 @@
 from PyQt5.QtWidgets import QPushButton
+from PyQt5.QtWidgets import QAbstractButton
+
 
 class Button(QPushButton):
     def __init__(self, rgb, parent=None):
