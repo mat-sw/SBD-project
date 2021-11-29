@@ -19,7 +19,10 @@ middle_of_screen = np.array([1920/2 - width/2, 1080/2 - heigth/2])
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window_1 = Login_window(pos=middle_of_screen + pos, size=[width, heigth])
-    window_1.show()
+    window = Login_window(pos=middle_of_screen + pos, size=[width, heigth])
+    window.show()
 
-    sys.exit(app.exec_())
+    try:
+        sys.exit(app.exec_())
+    except SystemExit:
+        print('Window\'s closing')

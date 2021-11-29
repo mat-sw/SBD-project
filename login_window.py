@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QPushButton, QWidget, \
     QHBoxLayout, QLineEdit, QLabel, QMessageBox
 from PyQt5.QtCore import Qt
+from main_window import Main_Window
 
 
 class Login_window(QWidget):
@@ -40,6 +41,8 @@ class Login_window(QWidget):
             self.close()
         elif e.key() == Qt.Key_Return:  # enter
             self.authorize()
+        else:
+            self.infoLabel.setVisible(False)
 
     def closeEvent(self, event):
         odp = QMessageBox.question(
@@ -54,7 +57,14 @@ class Login_window(QWidget):
 
     def authorize(self):
         if self.loginLine.text() == 'admin' and self.passLine.text() == 'admin':
-            self.close()
-
+            self.goToMainWindow()
+            # super(Main_Window, self)
+            # self.close()
         else:
             self.infoLabel.setVisible(True)
+
+    def goToMainWindow(self):
+        self.window = Main_Window()
+        self.window.show()
+        self.close()
+
