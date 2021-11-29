@@ -1,6 +1,7 @@
-from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QPushButton, \
-    QWidget, QHBoxLayout, QLineEdit, QLabel, QMessageBox
+from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QPushButton, QWidget, \
+    QHBoxLayout, QLineEdit, QLabel, QMessageBox
 from PyQt5.QtCore import Qt
+
 
 class Login_window(QWidget):
     def __init__(self, pos, size):
@@ -32,12 +33,12 @@ class Login_window(QWidget):
 
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
-        self.setWindowTitle("Login Screen")
+        self.setWindowTitle(title)
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Escape:
             self.close()
-        elif e.key() == Qt.Key_Return: # enter
+        elif e.key() == Qt.Key_Return:  # enter
             self.authorize()
 
     def closeEvent(self, event):
