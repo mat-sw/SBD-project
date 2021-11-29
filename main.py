@@ -8,6 +8,7 @@ dokumentacja tego syfu
 https://doc.qt.io/qtforpython/api.html
 help https://python-catalin.blogspot.com/2018/11/python-qt5-setstylesheet-example.html
 rgb creator https://www.rapidtables.com/web/color/RGB_Color.html
+https://docs.python.org/2/library/sqlite3.html
 """
 pos = np.array([0, 0])
 width = 1000
