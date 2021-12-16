@@ -16,6 +16,7 @@ class Login_window(QWidget):
         info_grid = QHBoxLayout()
         self.loginLine = QLineEdit()
         self.passLine = QLineEdit()
+        self.passLine.setEchoMode(QLineEdit.Password)
         self.loginLabel = QLabel('Wpisz login:')
         self.infoLabel = QLabel('Niepoprawne dane!\nSpróbuj zalogować się jeszcze raz')
         self.passLabel = QLabel('Wpisz hasło:')
