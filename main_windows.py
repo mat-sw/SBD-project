@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QPushButton, QWidget, \
     QHBoxLayout, QLineEdit, QLabel, QMessageBox
 from PyQt5.QtCore import Qt
 import numpy as np
+import math
 
 width = 1000
 height = 600
@@ -85,6 +86,7 @@ class Main_Window(QWidget):
         info_label.setAlignment(Qt.AlignCenter)
         wyloguj = QPushButton("Wyloguj się", self)
         wyloguj.setCheckable(True)
+        wyloguj.setStyleSheet(" background-color: rgb(195, 238, 146)")
         bilet = QPushButton("&Bilety", self)
         bilet.setCheckable(True)
         kierowca = QPushButton("&Kierowcy (Motorniczy)", self)
@@ -109,7 +111,12 @@ class Main_Window(QWidget):
         producent.setCheckable(True)
         gdzie = QPushButton("&Gdzie kupować bilet", self)
         gdzie.setCheckable(True)
-        my_grid.addWidget(info_label)
+
+        for button in [bilet, gdzie, biletomat, kasa, pojazd, model, producent, kierowca, linia, przystanek, strefa, miasto]:
+            button.setStyleSheet("background-color: rgb(171, 195, 249)")
+
+        info_line.addWidget(info_label)
+        info_line.addWidget(wyloguj)
         first_line.addWidget(bilet)
         first_line.addWidget(gdzie)
         first_line.addWidget(biletomat)
@@ -122,11 +129,11 @@ class Main_Window(QWidget):
         third_line.addWidget(przystanek)
         third_line.addWidget(strefa)
         third_line.addWidget(miasto)
-        my_grid.addLayout(first_line)
-        my_grid.addLayout(second_line)
-        my_grid.addLayout(third_line)
+
+        for layout in [info_line, first_line, second_line, third_line]:
+            my_grid.addLayout(layout)
         self.setLayout(my_grid)
-        self.setup(pos, size/2, "Main menu")
+        self.setup(pos, size/2+100, "Main menu")
 
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
@@ -157,8 +164,8 @@ class Main_Window(QWidget):
 
     def goToLoginWindow(self):
         self.window = Login_window()
-        self.window.show()
         self.close()
+        self.window.show()
 
     def goToCityWindow(self):
         pass
