@@ -83,6 +83,35 @@ class Main_Window(QWidget):
         first_line = QHBoxLayout()
         second_line = QHBoxLayout()
         third_line = QHBoxLayout()
+
+        self.add_buttons()
+
+        for button in [self.bilet, self.gdzie, self.biletomat, self.kasa, self.pojazd, self.model, self.producent, self.kierowca, self.linia, self.przystanek, self.strefa, self.miasto]:
+            button.setStyleSheet("background-color: rgb(171, 195, 249)")
+
+        info_line.addWidget(self.info_label)
+        info_line.addWidget(self.wyloguj)
+        first_line.addWidget(self.bilet)
+        first_line.addWidget(self.gdzie)
+        first_line.addWidget(self.biletomat)
+        first_line.addWidget(self.kasa)
+        second_line.addWidget(self.pojazd)
+        second_line.addWidget(self.model)
+        second_line.addWidget(self.producent)
+        second_line.addWidget(self.kierowca)
+        third_line.addWidget(self.linia)
+        third_line.addWidget(self.przystanek)
+        third_line.addWidget(self.strefa)
+        third_line.addWidget(self.miasto)
+
+        self.choose()
+
+        for layout in [info_line, first_line, second_line, third_line]:
+            my_grid.addLayout(layout)
+        self.setLayout(my_grid)
+        self.setup(pos, size/2+100, "Main menu")
+
+    def add_buttons(self):
         self.info_label = QLabel("Wybierz co byś chciał modyfikować", self)
         self.info_label.setAlignment(Qt.AlignCenter)
         self.wyloguj = QPushButton("Wyloguj się", self)
@@ -113,31 +142,6 @@ class Main_Window(QWidget):
         self.gdzie = QPushButton("&Gdzie kupować bilet", self)
         self.gdzie.setCheckable(True)
 
-        for button in [self.bilet, self.gdzie, self.biletomat, self.kasa, self.pojazd, self.model, self.producent, self.kierowca, self.linia, self.przystanek, self.strefa, self.miasto]:
-            button.setStyleSheet("background-color: rgb(171, 195, 249)")
-
-        info_line.addWidget(self.info_label)
-        info_line.addWidget(self.wyloguj)
-        first_line.addWidget(self.bilet)
-        first_line.addWidget(self.gdzie)
-        first_line.addWidget(self.biletomat)
-        first_line.addWidget(self.kasa)
-        second_line.addWidget(self.pojazd)
-        second_line.addWidget(self.model)
-        second_line.addWidget(self.producent)
-        second_line.addWidget(self.kierowca)
-        third_line.addWidget(self.linia)
-        third_line.addWidget(self.przystanek)
-        third_line.addWidget(self.strefa)
-        third_line.addWidget(self.miasto)
-
-        self.choose()
-
-        for layout in [info_line, first_line, second_line, third_line]:
-            my_grid.addLayout(layout)
-        self.setLayout(my_grid)
-        self.setup(pos, size/2+100, "Main menu")
-
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
         self.setWindowTitle(title)
@@ -151,6 +155,7 @@ class Main_Window(QWidget):
             self.infoLabel.setVisible(False)
 
     def closeEvent(self, event):
+        self.wyloguj.setChecked(False)
         odp = QMessageBox.question(
             self, 'Komunikat',
             "Czy na pewno chcesz się wylogować?",
@@ -163,9 +168,6 @@ class Main_Window(QWidget):
             event.ignore()
 
     def choose(self):
-        # for button, fun in [self.bilet, self.gdzie, self.biletomat, self.kasa, self.pojazd, self.model, self.producent, self.kierowca, self.linia, self.przystanek, self.strefa, self.miasto]\
-        # , [self.goToTicketWindow(), self.goToWhereWindow(), self.goToTicketMachineWindow(), self.goToTicketOfficeWindow(), self.goToVehiclesWindow(), self.goToModelWindow(),
-        #    self.goToProducersWindow(), self.goToDriverWindow(), self.goToLinesWindow(), self.goToStopsWindow(), self.goToZonesWindow(), self.goToCityWindow()]:
         self.bilet.clicked.connect(self.goToTicketWindow)
         self.kierowca.clicked.connect(self.goToDriverWindow)
         self.gdzie.clicked.connect(self.goToWhereWindow)
