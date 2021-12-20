@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QPushButton, QWidget, \
 from PyQt5.QtCore import Qt
 import numpy as np
 import math
+from function_windows import *
 
 width = 1000
 height = 600
@@ -82,53 +83,55 @@ class Main_Window(QWidget):
         first_line = QHBoxLayout()
         second_line = QHBoxLayout()
         third_line = QHBoxLayout()
-        info_label = QLabel("Wybierz co byś chciał modyfikować", self)
-        info_label.setAlignment(Qt.AlignCenter)
-        wyloguj = QPushButton("Wyloguj się", self)
-        wyloguj.setCheckable(True)
-        wyloguj.setStyleSheet(" background-color: rgb(195, 238, 146)")
-        bilet = QPushButton("&Bilety", self)
-        bilet.setCheckable(True)
-        kierowca = QPushButton("&Kierowcy (Motorniczy)", self)
-        kierowca.setCheckable(True)
-        pojazd = QPushButton("&Pojazdy", self)
-        pojazd.setCheckable(True)
-        przystanek = QPushButton("P&rzystanki", self)
-        przystanek.setCheckable(True)
-        miasto = QPushButton("&Miasta", self)
-        miasto.setCheckable(True)
-        strefa = QPushButton("&Strefy", self)
-        strefa.setCheckable(True)
-        linia = QPushButton("&Linie", self)
-        linia.setCheckable(True)
-        model = QPushButton("M&odele pojazdu", self)
-        model.setCheckable(True)
-        biletomat = QPushButton("Biletomaty", self)
-        biletomat.setCheckable(True)
-        kasa = QPushButton("Kasy biletowe", self)
-        kasa.setCheckable(True)
-        producent = QPushButton("Producenci pojazdu", self)
-        producent.setCheckable(True)
-        gdzie = QPushButton("&Gdzie kupować bilet", self)
-        gdzie.setCheckable(True)
+        self.info_label = QLabel("Wybierz co byś chciał modyfikować", self)
+        self.info_label.setAlignment(Qt.AlignCenter)
+        self.wyloguj = QPushButton("Wyloguj się", self)
+        self.wyloguj.setCheckable(True)
+        self.wyloguj.setStyleSheet(" background-color: rgb(195, 238, 146)")
+        self.bilet = QPushButton("&Bilety", self)
+        self.bilet.setCheckable(True)
+        self.kierowca = QPushButton("&Kierowcy (Motorniczy)", self)
+        self.kierowca.setCheckable(True)
+        self.pojazd = QPushButton("&Pojazdy", self)
+        self.pojazd.setCheckable(True)
+        self.przystanek = QPushButton("P&rzystanki", self)
+        self.przystanek.setCheckable(True)
+        self.miasto = QPushButton("&Miasta", self)
+        self.miasto.setCheckable(True)
+        self.strefa = QPushButton("&Strefy", self)
+        self.strefa.setCheckable(True)
+        self.linia = QPushButton("&Linie", self)
+        self.linia.setCheckable(True)
+        self.model = QPushButton("M&odele pojazdu", self)
+        self.model.setCheckable(True)
+        self.biletomat = QPushButton("Biletomaty", self)
+        self.biletomat.setCheckable(True)
+        self.kasa = QPushButton("Kasy biletowe", self)
+        self.kasa.setCheckable(True)
+        self.producent = QPushButton("Producenci pojazdu", self)
+        self.producent.setCheckable(True)
+        self.gdzie = QPushButton("&Gdzie kupować bilet", self)
+        self.gdzie.setCheckable(True)
 
-        for button in [bilet, gdzie, biletomat, kasa, pojazd, model, producent, kierowca, linia, przystanek, strefa, miasto]:
+        for button in [self.bilet, self.gdzie, self.biletomat, self.kasa, self.pojazd, self.model, self.producent, self.kierowca, self.linia, self.przystanek, self.strefa, self.miasto]:
             button.setStyleSheet("background-color: rgb(171, 195, 249)")
 
-        info_line.addWidget(info_label)
-        info_line.addWidget(wyloguj)
-        first_line.addWidget(bilet)
-        first_line.addWidget(gdzie)
-        first_line.addWidget(biletomat)
-        first_line.addWidget(kasa)
-        second_line.addWidget(pojazd)
-        second_line.addWidget(model)
-        second_line.addWidget(producent)
-        second_line.addWidget(kierowca)
-        third_line.addWidget(linia)
-        third_line.addWidget(przystanek)
-        third_line.addWidget(strefa)
-        third_line.addWidget(miasto)
+        info_line.addWidget(self.info_label)
+        info_line.addWidget(self.wyloguj)
+        first_line.addWidget(self.bilet)
+        first_line.addWidget(self.gdzie)
+        first_line.addWidget(self.biletomat)
+        first_line.addWidget(self.kasa)
+        second_line.addWidget(self.pojazd)
+        second_line.addWidget(self.model)
+        second_line.addWidget(self.producent)
+        second_line.addWidget(self.kierowca)
+        third_line.addWidget(self.linia)
+        third_line.addWidget(self.przystanek)
+        third_line.addWidget(self.strefa)
+        third_line.addWidget(self.miasto)
+
+        self.choose()
 
         for layout in [info_line, first_line, second_line, third_line]:
             my_grid.addLayout(layout)
@@ -160,7 +163,23 @@ class Main_Window(QWidget):
             event.ignore()
 
     def choose(self):
-        pass
+        # for button, fun in [self.bilet, self.gdzie, self.biletomat, self.kasa, self.pojazd, self.model, self.producent, self.kierowca, self.linia, self.przystanek, self.strefa, self.miasto]\
+        # , [self.goToTicketWindow(), self.goToWhereWindow(), self.goToTicketMachineWindow(), self.goToTicketOfficeWindow(), self.goToVehiclesWindow(), self.goToModelWindow(),
+        #    self.goToProducersWindow(), self.goToDriverWindow(), self.goToLinesWindow(), self.goToStopsWindow(), self.goToZonesWindow(), self.goToCityWindow()]:
+        self.bilet.clicked.connect(self.goToTicketWindow)
+        self.kierowca.clicked.connect(self.goToDriverWindow)
+        self.gdzie.clicked.connect(self.goToWhereWindow)
+        self.biletomat.clicked.connect(self.goToTicketMachineWindow)
+        self.kasa.clicked.connect(self.goToTicketOfficeWindow)
+        self.pojazd.clicked.connect(self.goToVehiclesWindow)
+        self.model.clicked.connect(self.goToModelWindow)
+        self.producent.clicked.connect(self.goToProducersWindow)
+        self.linia.clicked.connect(self.goToLinesWindow)
+        self.przystanek.clicked.connect(self.goToStopsWindow)
+        self.strefa.clicked.connect(self.goToZonesWindow)
+        self.miasto.clicked.connect(self.goToCityWindow)
+        self.wyloguj.clicked.connect(self.close)
+
 
     def goToLoginWindow(self):
         self.window = Login_window()
@@ -168,37 +187,61 @@ class Main_Window(QWidget):
         self.window.show()
 
     def goToCityWindow(self):
-        pass
+        self.window = City(pos+50, size/2)
+        self.window.show()
+        self.miasto.setChecked(False)
 
-    def goToDrivertWindow(self):
-        pass
+    def goToDriverWindow(self):
+        self.window = Driver(pos+50, size/2)
+        self.window.show()
+        self.kierowca.setChecked(False)
 
     def goToLinesWindow(self):
-        pass
+        self.window = Line(pos+50, size/2)
+        self.window.show()
+        self.linia.setChecked(False)
 
     def goToModelWindow(self):
-        pass
+        self.window = Model(pos+50, size/2)
+        self.window.show()
+        self.model.setChecked(False)
 
     def goToProducersWindow(self):
-        pass
+        self.window = Producent(pos+50, size/2)
+        self.window.show()
+        self.producent.setChecked(False)
 
     def goToStopsWindow(self):
-        pass
+        self.window = Stop(pos+50, size/2)
+        self.window.show()
+        self.przystanek.setChecked(False)
 
     def goToTicketWindow(self):
-        pass
+        self.window = Tickets(pos+50, size/2)
+        self.window.show()
+        self.bilet.setChecked(False)
 
     def goToTicketOfficeWindow(self):
-        pass
+        self.window = TicketOffice(pos+50, size/2)
+        self.window.show()
+        self.kasa.setChecked(False)
 
     def goToTicketMachineWindow(self):
-        pass
+        self.window = TicketMachine(pos+50, size/2)
+        self.window.show()
+        self.biletomat.setChecked(False)
 
     def goToVehiclesWindow(self):
-        pass
+        self.window = Vehicle(pos+50, size/2)
+        self.window.show()
+        self.pojazd.setChecked(False)
 
     def goToWhereWindow(self):
-        pass
+        self.window = Where(pos+50, size/2)
+        self.window.show()
+        self.gdzie.setChecked(False)
 
     def goToZonesWindow(self):
-        pass
+        self.window = Zone(pos+50, size/2)
+        self.window.show()
+        self.strefa.setChecked(False)
