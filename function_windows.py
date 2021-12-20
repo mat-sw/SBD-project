@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QPushButton, QWidget, \
     QHBoxLayout, QLineEdit, QLabel, QMessageBox
 from PyQt5.QtCore import Qt
 
+
 class Tickets(QWidget):
     def __init__(self, pos, size):
         super(Tickets, self).__init__()
@@ -10,6 +11,7 @@ class Tickets(QWidget):
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
         self.setWindowTitle(title)
+
 
 class City(QWidget):
     def __init__(self, pos, size):
@@ -20,6 +22,7 @@ class City(QWidget):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
         self.setWindowTitle(title)
 
+
 class Vehicle(QWidget):
     def __init__(self, pos, size):
         super(Vehicle, self).__init__()
@@ -28,6 +31,7 @@ class Vehicle(QWidget):
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
         self.setWindowTitle(title)
+
 
 class Driver(QWidget):
     def __init__(self, pos, size):
@@ -38,6 +42,7 @@ class Driver(QWidget):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
         self.setWindowTitle(title)
 
+
 class Model(QWidget):
     def __init__(self, pos, size):
         super(Model, self).__init__()
@@ -46,6 +51,7 @@ class Model(QWidget):
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
         self.setWindowTitle(title)
+
 
 class Producent(QWidget):
     def __init__(self, pos, size):
@@ -56,6 +62,7 @@ class Producent(QWidget):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
         self.setWindowTitle(title)
 
+
 class TicketOffice(QWidget):
     def __init__(self, pos, size):
         super(TicketOffice, self).__init__()
@@ -64,6 +71,7 @@ class TicketOffice(QWidget):
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
         self.setWindowTitle(title)
+
 
 class Line(QWidget):
     def __init__(self, pos, size):
@@ -74,6 +82,7 @@ class Line(QWidget):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
         self.setWindowTitle(title)
 
+
 class Stop(QWidget):
     def __init__(self, pos, size):
         super(Stop, self).__init__()
@@ -82,6 +91,7 @@ class Stop(QWidget):
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
         self.setWindowTitle(title)
+
 
 class TicketMachine(QWidget):
     def __init__(self, pos, size):
@@ -92,6 +102,7 @@ class TicketMachine(QWidget):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
         self.setWindowTitle(title)
 
+
 class Zone(QWidget):
     def __init__(self, pos, size):
         super(Zone, self).__init__()
@@ -101,6 +112,7 @@ class Zone(QWidget):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
         self.setWindowTitle(title)
 
+
 class Where(QWidget):
     def __init__(self, pos, size):
         super(Where, self).__init__()
@@ -109,4 +121,3 @@ class Where(QWidget):
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
         self.setWindowTitle(title)
-

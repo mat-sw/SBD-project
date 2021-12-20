@@ -1,5 +1,5 @@
 import sys
-from main_windows import Login_window
+from main_windows import LoginWindow
 from PyQt5.QtWidgets import QApplication
 import numpy as np
 
@@ -20,7 +20,7 @@ middle_of_screen = np.array([1920/2 - width/2, 1080/2 - height/2])
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = Login_window()
+    window = LoginWindow()
     window.show()
 
     try:
