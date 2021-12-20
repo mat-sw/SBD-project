@@ -14,7 +14,7 @@ class Tickets(QWidget):
 class City(QWidget):
     def __init__(self, pos, size):
         super(City, self).__init__()
-        self.setup(pos, size, "Tickets")
+        self.setup(pos, size, "Cities")
 
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
@@ -23,7 +23,7 @@ class City(QWidget):
 class Vehicle(QWidget):
     def __init__(self, pos, size):
         super(Vehicle, self).__init__()
-        self.setup(pos, size, "Tickets")
+        self.setup(pos, size, "Vehicles")
 
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
@@ -32,7 +32,7 @@ class Vehicle(QWidget):
 class Driver(QWidget):
     def __init__(self, pos, size):
         super(Driver, self).__init__()
-        self.setup(pos, size, "Tickets")
+        self.setup(pos, size, "Drivers")
 
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
@@ -41,7 +41,7 @@ class Driver(QWidget):
 class Model(QWidget):
     def __init__(self, pos, size):
         super(Model, self).__init__()
-        self.setup(pos, size, "Tickets")
+        self.setup(pos, size, "Models")
 
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
@@ -50,7 +50,7 @@ class Model(QWidget):
 class Producent(QWidget):
     def __init__(self, pos, size):
         super(Producent, self).__init__()
-        self.setup(pos, size, "Tickets")
+        self.setup(pos, size, "Producers")
 
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
@@ -59,7 +59,7 @@ class Producent(QWidget):
 class TicketOffice(QWidget):
     def __init__(self, pos, size):
         super(TicketOffice, self).__init__()
-        self.setup(pos, size, "Tickets")
+        self.setup(pos, size, "Ticket Offices")
 
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
@@ -68,7 +68,7 @@ class TicketOffice(QWidget):
 class Line(QWidget):
     def __init__(self, pos, size):
         super(Line, self).__init__()
-        self.setup(pos, size, "Tickets")
+        self.setup(pos, size, "Lines")
 
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
@@ -77,7 +77,7 @@ class Line(QWidget):
 class Stop(QWidget):
     def __init__(self, pos, size):
         super(Stop, self).__init__()
-        self.setup(pos, size, "Tickets")
+        self.setup(pos, size, "Stops")
 
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
@@ -86,7 +86,7 @@ class Stop(QWidget):
 class TicketMachine(QWidget):
     def __init__(self, pos, size):
         super(TicketMachine, self).__init__()
-        self.setup(pos, size, "Tickets")
+        self.setup(pos, size, "Ticket Machines")
 
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
@@ -95,7 +95,7 @@ class TicketMachine(QWidget):
 class Zone(QWidget):
     def __init__(self, pos, size):
         super(Zone, self).__init__()
-        self.setup(pos, size, "Tickets")
+        self.setup(pos, size, "Zones")
 
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
@@ -104,7 +104,7 @@ class Zone(QWidget):
 class Where(QWidget):
     def __init__(self, pos, size):
         super(Where, self).__init__()
-        self.setup(pos, size, "Tickets")
+        self.setup(pos, size, "Where")
 
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
