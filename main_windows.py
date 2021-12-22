@@ -2,6 +2,8 @@ from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QPushButton, QWidget, \
     QHBoxLayout, QLineEdit, QLabel, QMessageBox
 from PyQt5.QtCore import Qt
 import numpy as np
+
+import function_windows
 from function_windows import *
 
 width = 1000
@@ -51,7 +53,7 @@ class LoginWindow(QWidget):
         if e.key() == Qt.Key_Escape:
             self.close()
         elif e.key() == Qt.Key_Return:  # enter
-            self.authorize()
+            self.goToMainWindow()
         else:
             self.infoLabel.setVisible(False)
 
@@ -82,11 +84,10 @@ class MainWindow(QWidget):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.my_grid = QGridLayout()
-        self.v_grid = QVBoxLayout()
-        self.info_line = QHBoxLayout()
-        self.first_line = QHBoxLayout()
-        self.second_line = QHBoxLayout()
-        self.third_line = QHBoxLayout()
+        # self.info_line = QHBoxLayout()
+        # self.first_line = QHBoxLayout()
+        # self.second_line = QHBoxLayout()
+        # self.third_line = QHBoxLayout()
 
         self.add_buttons()
 
@@ -199,7 +200,7 @@ class MainWindow(QWidget):
         self.window.show()
 
     def goToTicketWindow(self):
-        self.window = Tickets(pos + 50, size / 2)
+        self.window = Tickets()
         self.window.show()
 
     def goToTicketOfficeWindow(self):
