@@ -1,15 +1,7 @@
 from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QPushButton, QWidget, \
     QHBoxLayout, QLineEdit, QLabel, QMessageBox
 from PyQt5.QtCore import Qt
-import numpy as np
-
-import function_windows
 from function_windows import *
-
-width = 1000
-height = 600
-pos = np.array([1920 / 2 - width / 2, 1080 / 2 - height / 2])
-size = np.array([width, height])
 
 
 class LoginWindow(QWidget):
@@ -84,11 +76,6 @@ class MainWindow(QWidget):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.my_grid = QGridLayout()
-        # self.info_line = QHBoxLayout()
-        # self.first_line = QHBoxLayout()
-        # self.second_line = QHBoxLayout()
-        # self.third_line = QHBoxLayout()
-
         self.add_buttons()
 
         for button in [self.bilet, self.gdzie, self.biletomat, self.kasa, self.pojazd, self.model,
