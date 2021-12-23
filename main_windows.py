@@ -20,7 +20,7 @@ class LoginWindow(QWidget):
         self.my_grid.addWidget(self.loginButt)
         self.loginButt.clicked.connect(self.authorize)
         self.setLayout(self.my_grid)
-        self.setup(pos, size / 2, "Login Screen")
+        self.setup(pos, size / 2, "Ekran logowania")
 
     def add_buttons(self):
         self.loginLine = QLineEdit()
@@ -95,7 +95,7 @@ class MainWindow(QWidget):
         self.my_grid.setSpacing(20)
         self.choose()
         self.setLayout(self.my_grid)
-        self.setup(pos, size * 2 / 3, "Main menu")
+        self.setup(pos, size * 2 / 3, "Główne menu")
 
     def add_buttons(self):
         self.info_label = QLabel("Wybierz co chciałbyś modyfikować", self)
