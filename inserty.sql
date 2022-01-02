@@ -1,0 +1,18 @@
+-- PRODUCENCI
+INSERT INTO PRODUCENT
+VALUES (1, 'Solaris');
+
+INSERT INTO PRODUCENT
+VALUES (2, 'Moderus');
+
+-- MIASTA
+INSERT INTO MIASTO
+VALUES('Poznań', 'miasto', 540365, 261.8);
+
+
+INSERT INTO MIASTO
+VALUES('Rokietnica', 'wieś', 7523, 6.8);
+
+
+INSERT INTO MIASTO
+VALUES('Swarzędz', 'wieś', 30739, 9);
