@@ -85,19 +85,17 @@ class MainWindow(QWidget):
         for button in [self.bilet, self.gdzie, self.biletomat, self.kasa, self.pojazd, self.model,
                        self.producent, self.kierowca, self.linia, self.przystanek, self.strefa, self.miasto]:
             button.setStyleSheet("background-color: rgb(171, 195, 249); font-size : 9pt")
+            button.setMinimumSize(QSize(160, 30))
 
         self.my_grid.addWidget(self.wyloguj, 0, 3, Qt.AlignCenter)
         self.my_grid.addWidget(self.info_label, 1, 0, 1, 4, Qt.AlignHCenter)
 
         for i, button in enumerate([self.bilet, self.gdzie, self.biletomat, self.kasa]):
             self.my_grid.addWidget(button, 2, i, Qt.AlignCenter)
-            button.setMinimumSize(QSize(160, 30))
         for i, button in enumerate([self.pojazd, self.model, self.producent, self.kierowca]):
             self.my_grid.addWidget(button, 3, i, Qt.AlignCenter)
-            button.setMinimumSize(QSize(160, 30))
         for i, button in enumerate([self.linia, self.przystanek, self.strefa, self.miasto]):
             self.my_grid.addWidget(button, 4, i, Qt.AlignCenter)
-            button.setMinimumSize(QSize(160, 30))
 
         self.my_grid.setSpacing(20)
         self.choose()
