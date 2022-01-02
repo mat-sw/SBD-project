@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QPushButton, QWidget, \
-    QHBoxLayout, QLineEdit, QLabel, QMessageBox
-from PyQt5.QtCore import Qt
+    QHBoxLayout, QLineEdit, QLabel, QMessageBox, QSizePolicy
+from PyQt5.QtCore import Qt, QSize
 from PyQt5 import QtGui
 from function_windows import *
 
@@ -91,10 +91,13 @@ class MainWindow(QWidget):
 
         for i, button in enumerate([self.bilet, self.gdzie, self.biletomat, self.kasa]):
             self.my_grid.addWidget(button, 2, i, Qt.AlignCenter)
+            button.setMinimumSize(QSize(160, 30))
         for i, button in enumerate([self.pojazd, self.model, self.producent, self.kierowca]):
             self.my_grid.addWidget(button, 3, i, Qt.AlignCenter)
+            button.setMinimumSize(QSize(160, 30))
         for i, button in enumerate([self.linia, self.przystanek, self.strefa, self.miasto]):
             self.my_grid.addWidget(button, 4, i, Qt.AlignCenter)
+            button.setMinimumSize(QSize(160, 30))
 
         self.my_grid.setSpacing(20)
         self.choose()
