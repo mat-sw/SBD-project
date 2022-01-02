@@ -110,7 +110,6 @@ class MainWindow(QWidget):
         self.wyloguj.setCheckable(True)
         self.wyloguj.setStyleSheet(" background-color: rgb(195, 238, 146); font-size : 10pt")
         self.bilet = QPushButton("&Bilety", self)
-        # self.bilet.resize(100, 100)
         self.kierowca = QPushButton("&Kierowcy (Motorniczy)", self)
         self.pojazd = QPushButton("&Pojazdy", self)
         self.przystanek = QPushButton("P&rzystanki", self)

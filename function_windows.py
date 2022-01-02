@@ -39,9 +39,7 @@ def connect_db():
 class Tickets(FunctionWindow):
     def __init__(self, conn):
         super(Tickets, self).__init__()
-        # self.initialze_grid()
-        self.main_grid = QGridLayout()
-        self.view = QTableWidget()
+        self.initialze_grid()
 
         # cur = conn.cursor()
         # cur.execute("Select id_typu_biletu, czy_ulgowy from bilet")
@@ -50,14 +48,11 @@ class Tickets(FunctionWindow):
         query = QSqlQuery()
         query.exec("""Select id_typu_biletu, czy_ulgowy from bilet""")
         while query.next():
-        # for i in range(4):
-            # print(query.value(0), query.value(1))
             rows = self.view.rowCount()
             self.view.setRowCount(rows + 1)
             self.view.setItem(rows, 0, QTableWidgetItem(str(query.value(0))))
             self.view.setItem(rows, 1, QTableWidgetItem(query.value(1)))
         self.view.resizeColumnsToContents()
-        self.main_grid.addWidget(self.view)
         self.setLayout(self.main_grid)
         self.setup(pos, size/2, "Bilety")
 
