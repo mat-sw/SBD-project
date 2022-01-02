@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QPushButton, QWidget, \
     QHBoxLayout, QLineEdit, QLabel, QMessageBox
 from PyQt5.QtCore import Qt
+from PyQt5 import QtGui
 from function_windows import *
 
 
@@ -45,7 +46,8 @@ class LoginWindow(QWidget):
         if e.key() == Qt.Key_Escape:
             self.close()
         elif e.key() == Qt.Key_Return:  # enter
-            self.goToMainWindow()
+            # self.goToMainWindow()
+            self.authorize()
         else:
             self.infoLabel.setVisible(False)
 
@@ -62,19 +64,21 @@ class LoginWindow(QWidget):
 
     def authorize(self):
         if self.loginLine.text() == 'admin' and self.passLine.text() == 'admin':
-            self.goToMainWindow()
+            conn = connect_db()
+            self.goToMainWindow(conn)
         else:
             self.infoLabel.setVisible(True)
 
-    def goToMainWindow(self):
-        self.window = MainWindow()
+    def goToMainWindow(self, conn):
+        self.window = MainWindow(conn)
         self.window.show()
         self.close()
 
 
 class MainWindow(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, conn, parent=None):
         super(MainWindow, self).__init__(parent)
+        self.conn = conn
         self.my_grid = QGridLayout()
         self.add_buttons()
 
@@ -105,6 +109,7 @@ class MainWindow(QWidget):
         self.wyloguj.setCheckable(True)
         self.wyloguj.setStyleSheet(" background-color: rgb(195, 238, 146); font-size : 10pt")
         self.bilet = QPushButton("&Bilety", self)
+        # self.bilet.resize(100, 100)
         self.kierowca = QPushButton("&Kierowcy (Motorniczy)", self)
         self.pojazd = QPushButton("&Pojazdy", self)
         self.przystanek = QPushButton("P&rzystanki", self)
@@ -163,49 +168,49 @@ class MainWindow(QWidget):
         self.window.show()
 
     def goToCityWindow(self):
-        self.window = City(pos + 50, size / 2)
+        self.window = City(self.conn)
         self.window.show()
 
     def goToDriverWindow(self):
-        self.window = Driver(pos + 50, size / 2)
+        self.window = Driver(self.conn)
         self.window.show()
 
     def goToLinesWindow(self):
-        self.window = Line(pos + 50, size / 2)
+        self.window = Line(self.conn)
         self.window.show()
 
     def goToModelWindow(self):
-        self.window = Model(pos + 50, size / 2)
+        self.window = Model(self.conn)
         self.window.show()
 
     def goToProducersWindow(self):
-        self.window = Producent(pos + 50, size / 2)
+        self.window = Producent(self.conn)
         self.window.show()
 
     def goToStopsWindow(self):
-        self.window = Stop(pos + 50, size / 2)
+        self.window = Stop(self.conn)
         self.window.show()
 
     def goToTicketWindow(self):
-        self.window = Tickets()
+        self.window = Tickets(self.conn)
         self.window.show()
 
     def goToTicketOfficeWindow(self):
-        self.window = TicketOffice(pos + 50, size / 2)
+        self.window = TicketOffice(self.conn)
         self.window.show()
 
     def goToTicketMachineWindow(self):
-        self.window = TicketMachine(pos + 50, size / 2)
+        self.window = TicketMachine(self.conn)
         self.window.show()
 
     def goToVehiclesWindow(self):
-        self.window = Vehicle(pos + 50, size / 2)
+        self.window = Vehicle(self.conn)
         self.window.show()
 
     def goToWhereWindow(self):
-        self.window = Where(pos + 50, size / 2)
+        self.window = Where(self.conn)
         self.window.show()
 
     def goToZonesWindow(self):
-        self.window = Zone(pos + 50, size / 2)
+        self.window = Zone(self.conn)
         self.window.show()

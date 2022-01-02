@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QPushButton, QWidget, \
 from PyQt5.QtCore import Qt
 
 
+
 class FunctionWindow(QWidget):
     def __init__(self):
         super(FunctionWindow, self).__init__()
@@ -30,3 +31,7 @@ class FunctionWindow(QWidget):
 
     def choose(self):
         pass
+
+    def keyPressEvent(self, e):
+        if e.key() == Qt.Key_Escape:
+            self.close()

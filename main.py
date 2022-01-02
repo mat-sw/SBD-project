@@ -10,6 +10,7 @@ help https://python-catalin.blogspot.com/2018/11/python-qt5-setstylesheet-exampl
 rgb creator https://www.rapidtables.com/web/color/RGB_Color.html
 https://docs.python.org/2/library/sqlite3.html
 https://python101.readthedocs.io/pl/latest/pyqt/index.html
+https://realpython.com/python-pyqt-database/#displaying-and-editing-data-with-pyqt - pyqt bazy danych
 """
 
 if __name__ == '__main__':
