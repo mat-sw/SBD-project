@@ -14,6 +14,7 @@ height = 600
 pos = np.array([1920 / 2 - width / 2, 1080 / 2 - height / 2])
 size = np.array([width, height])
 
+
 def connect_db():
     conn = psycopg2.connect(database=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT)
     print(conn)
@@ -36,17 +37,19 @@ def connect_db():
     #     return False
     # return True
 
+
 def delete_from_db(db, what, item, conn):
-    command = 'DELETE FROM %s WHERE %s = %i;'
     cur = conn.cursor()
-    cur.execute(command, (db, what, item))
+    cur.execute("DELETE FROM %s WHERE %s = %s;" % (db, what, item))
+    conn.commit()
+    cur.close()
 
 
 class Arrival(FunctionWindow):
     def __init__(self, conn):
         super(Arrival, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size/2, "Przyjazdy")
+        self.setup(pos, size / 2, "Przyjazdy")
 
 
 class Tickets(FunctionWindow):
@@ -54,8 +57,6 @@ class Tickets(FunctionWindow):
         super(Tickets, self).__init__()
         self.initialze_grid()
 
-        # cur = conn.cursor()
-        # cur.execute("Select id_typu_biletu, czy_ulgowy from bilet")
         self.view.setColumnCount(2)
         self.view.setHorizontalHeaderLabels(["ID biletu", "Ulgowy?"])
         query = QSqlQuery()
@@ -68,7 +69,7 @@ class Tickets(FunctionWindow):
             self.view.setItem(rows, 1, QTableWidgetItem(query.value(1)))
         self.view.resizeColumnsToContents()
 
-        self.setup(pos, size/2, "Bilety")
+        self.setup(pos, size / 2, "Bilety")
 
 
 class City(FunctionWindow):
@@ -79,6 +80,7 @@ class City(FunctionWindow):
         cur = conn.cursor()
         cur.execute("Select * from miasto;")
         data = cur.fetchall()
+        cur.close()
         self.view.setColumnCount(5)
         self.view.setHorizontalHeaderLabels(["Nazwa", "Status", "Liczba mieszkańców", "Powierzchnia", ""])
         for item in data:
@@ -91,28 +93,28 @@ class City(FunctionWindow):
             self.view.setItem(rows, 4, QTableWidgetItem("Usuń"))
         self.view.resizeColumnsToContents()
 
-        self.setup(pos, size/2, "Miasta")
+        self.setup(pos, size / 2, "Miasta")
 
 
 class Vehicle(FunctionWindow):
     def __init__(self, conn):
         super(Vehicle, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size/2, "Pojazdy")
+        self.setup(pos, size / 2, "Pojazdy")
 
 
 class Driver(FunctionWindow):
     def __init__(self, conn):
         super(Driver, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size/2, "Kierowcy")
+        self.setup(pos, size / 2, "Kierowcy")
 
 
 class Model(FunctionWindow):
     def __init__(self, conn):
         super(Model, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size/2, "Modele")
+        self.setup(pos, size / 2, "Modele")
 
 
 class Producent(FunctionWindow):
@@ -157,68 +159,60 @@ class Producent(FunctionWindow):
         #     self.view.setItem(rows, 0, QTableWidgetItem(str(query.value(0))))
         #     self.view.setItem(rows, 1, QTableWidgetItem(query.value(1)))
         # self.view.resizeColumnsToContents()
-        self.setup(pos, size/2, "Producenci")
+        self.setup(pos, size / 2, "Producenci")
 
     def get_signal(self):
         self.view.clicked.connect(self.func_test)
 
     def func_test(self, item):
-        cellContent = item.data()
-        if cellContent == "Usuń":
-            cur = self.conn.cursor()
-            # print(self.data[item.row()][0])
-            # delete_from_db("producent", "id_producenta", self.data[item.row()][0], self.conn)
+        if item.data() == "Usuń":
             try:
-                cur.execute("DELETE FROM producent WHERE id_producenta = {};".format(self.data[item.row()][0]))
-                self.conn.commit()
-                cur.close()
+                delete_from_db("producent", "id_producenta", str(self.data[item.row()][0]), self.conn)
                 self.close()
             except:
                 print("Cannot delete this record")
-        # sf = "You clicked on {}".format(cellContent)
-        # print(sf)
 
 
 class TicketOffice(FunctionWindow):
     def __init__(self, conn):
         super(TicketOffice, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size/2, "Kasy biletowe")
+        self.setup(pos, size / 2, "Kasy biletowe")
 
 
 class Line(FunctionWindow):
     def __init__(self, conn):
         super(Line, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size/2, "Linie")
+        self.setup(pos, size / 2, "Linie")
 
 
 class Stop(FunctionWindow):
     def __init__(self, conn):
         super(Stop, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size/2, "Przystanki")
+        self.setup(pos, size / 2, "Przystanki")
 
 
 class StopsOrder(FunctionWindow):
     def __init__(self, conn):
         super(StopsOrder, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size/2, "kolejność przystanków")
+        self.setup(pos, size / 2, "kolejność przystanków")
 
 
 class TicketMachine(FunctionWindow):
     def __init__(self, conn):
         super(TicketMachine, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size/2, "Biletomaty")
+        self.setup(pos, size / 2, "Biletomaty")
 
 
 class TimeOfRide(FunctionWindow):
     def __init__(self, conn):
         super(TimeOfRide, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size/2, "Czasy przejazdów")
+        self.setup(pos, size / 2, "Czasy przejazdów")
 
 
 class Zone(FunctionWindow):
@@ -241,22 +235,15 @@ class Zone(FunctionWindow):
         self.view.resizeColumnsToContents()
         self.get_signal()
 
-        self.setup(pos, size/2, "Strefy")
-
+        self.setup(pos, size / 2, "Strefy")
 
     def get_signal(self):
         self.view.clicked.connect(self.func_test)
 
     def func_test(self, item):
-        cellContent = item.data()
-        if cellContent == "Usuń":
-            cur = self.conn.cursor()
-            print(self.data[item.row()][0])
-            # delete_from_db("producent", "id_producenta", self.data[item.row()][0], self.conn)
+        if item.data() == "Usuń":
             try:
-                cur.execute("DELETE FROM strefa WHERE typ_strefy = {};".format(self.data[item.row()][0]))
-                self.conn.commit()
-                cur.close()
+                delete_from_db("strefa", "typ_strefy", self.data[item.row()][0], self.conn)
                 self.close()
             except:
                 print("Cannot delete this record")
@@ -266,4 +253,4 @@ class Where(FunctionWindow):
     def __init__(self, conn):
         super(Where, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size/2, "Gdzie można kupić bilet")
+        self.setup(pos, size / 2, "Gdzie można kupić bilet")
