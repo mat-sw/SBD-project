@@ -170,10 +170,13 @@ class Producent(FunctionWindow):
             cur = self.conn.cursor()
             # print(self.data[item.row()][0])
             # delete_from_db("producent", "id_producenta", self.data[item.row()][0], self.conn)
-            cur.execute("DELETE FROM producent WHERE id_producenta = {};".format(self.data[item.row()][0]))
-            self.conn.commit()
-            cur.close()
-            self.close()
+            try:
+                cur.execute("DELETE FROM producent WHERE id_producenta = {};".format(self.data[item.row()][0]))
+                self.conn.commit()
+                cur.close()
+                self.close()
+            except:
+                print("Cannot delete this record")
         # sf = "You clicked on {}".format(cellContent)
         # print(sf)
 
@@ -252,10 +255,13 @@ class Zone(FunctionWindow):
             cur = self.conn.cursor()
             print(self.data[item.row()][0])
             # delete_from_db("producent", "id_producenta", self.data[item.row()][0], self.conn)
-            cur.execute("DELETE FROM strefa WHERE typ_strefy = {};".format(self.data[item.row()][0]))
-            self.conn.commit()
-            cur.close()
-            self.close()
+            try:
+                cur.execute("DELETE FROM strefa WHERE typ_strefy = {};".format(self.data[item.row()][0]))
+                self.conn.commit()
+                cur.close()
+                self.close()
+            except:
+                print("Cannot delete this record")
 
 
 class Where(FunctionWindow):
