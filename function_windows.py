@@ -44,6 +44,13 @@ def delete_from_db(db, what, item, conn):
     cur.execute(command, (db, what, item))
 
 
+class Arrival(FunctionWindow):
+    def __init__(self, conn):
+        super(Arrival, self).__init__()
+        self.initialze_grid()
+        self.setup(pos, size/2, "Przyjazdy")
+
+
 class Tickets(FunctionWindow):
     def __init__(self, conn):
         super(Tickets, self).__init__()
@@ -191,11 +198,25 @@ class Stop(FunctionWindow):
         self.setup(pos, size/2, "Przystanki")
 
 
+class StopsOrder(FunctionWindow):
+    def __init__(self, conn):
+        super(StopsOrder, self).__init__()
+        self.initialze_grid()
+        self.setup(pos, size/2, "kolejność przystanków")
+
+
 class TicketMachine(FunctionWindow):
     def __init__(self, conn):
         super(TicketMachine, self).__init__()
         self.initialze_grid()
         self.setup(pos, size/2, "Biletomaty")
+
+
+class TimeOfRide(FunctionWindow):
+    def __init__(self, conn):
+        super(TimeOfRide, self).__init__()
+        self.initialze_grid()
+        self.setup(pos, size/2, "Czasy przejazdów")
 
 
 class Zone(FunctionWindow):

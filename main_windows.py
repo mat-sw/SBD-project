@@ -83,7 +83,7 @@ class MainWindow(QWidget):
         self.add_buttons()
 
         for button in [self.bilet, self.gdzie, self.biletomat, self.kasa, self.pojazd, self.model,
-                       self.producent, self.kierowca, self.linia, self.przystanek, self.strefa, self.miasto]:
+                       self.producent, self.kierowca, self.linia, self.przystanek, self.strefa, self.miasto, self.czasy, self.przyjazdy, self.kolejnosc]:
             button.setStyleSheet("background-color: rgb(171, 195, 249); font-size : 9pt")
             button.setMinimumSize(QSize(160, 30))
 
@@ -96,6 +96,8 @@ class MainWindow(QWidget):
             self.my_grid.addWidget(button, 3, i, Qt.AlignCenter)
         for i, button in enumerate([self.linia, self.przystanek, self.strefa, self.miasto]):
             self.my_grid.addWidget(button, 4, i, Qt.AlignCenter)
+        for i, button in enumerate([self.czasy, self.przyjazdy, self.kolejnosc]):
+            self.my_grid.addWidget(button, 5, i, Qt.AlignCenter)
 
         self.my_grid.setSpacing(20)
         self.choose()
@@ -121,6 +123,9 @@ class MainWindow(QWidget):
         self.kasa = QPushButton("Kasy biletowe", self)
         self.producent = QPushButton("Producenci pojazdu", self)
         self.gdzie = QPushButton("&Gdzie kupować bilet", self)
+        self.czasy = QPushButton("Czasy przejazdów", self)
+        self.przyjazdy = QPushButton("Przyjazdy", self)
+        self.kolejnosc = QPushButton("Kolejność przystanków", self)
 
     def setup(self, pos, size, title):
         self.setGeometry(pos[0], pos[1], size[0], size[1])
@@ -160,6 +165,9 @@ class MainWindow(QWidget):
         self.przystanek.clicked.connect(self.goToStopsWindow)
         self.strefa.clicked.connect(self.goToZonesWindow)
         self.miasto.clicked.connect(self.goToCityWindow)
+        self.czasy.clicked.connect(self.goToTimeRWindow)
+        self.przyjazdy.clicked.connect(self.goToArrivalWindow)
+        self.kolejnosc.clicked.connect(self.goToStopOrderWindow)
         self.wyloguj.clicked.connect(self.close)
 
     def goToLoginWindow(self):
@@ -213,4 +221,16 @@ class MainWindow(QWidget):
 
     def goToZonesWindow(self):
         self.window = Zone(self.conn)
+        self.window.show()
+
+    def goToArrivalWindow(self):
+        self.window = Arrival(self.conn)
+        self.window.show()
+
+    def goToTimeRWindow(self):
+        self.window = TimeOfRide(self.conn)
+        self.window.show()
+
+    def goToStopOrderWindow(self):
+        self.window = StopsOrder(self.conn)
         self.window.show()
