@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QPushButton, QWidget, \
-    QHBoxLayout, QLineEdit, QLabel, QMessageBox, QSizePolicy
+    QHBoxLayout, QLineEdit, QLabel, QMessageBox
 from PyQt5.QtCore import Qt, QSize
-from PyQt5 import QtGui
 from function_windows import *
 
 

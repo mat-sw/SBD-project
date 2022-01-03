@@ -1,7 +1,6 @@
 import sys
 from main_windows import LoginWindow
 from PyQt5.QtWidgets import QApplication
-import numpy as np
 
 """
 dokumentacja tego syfu

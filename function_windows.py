@@ -1,6 +1,4 @@
-from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QPushButton, QWidget,\
-    QHBoxLayout, QLineEdit, QLabel, QMessageBox, QTableWidget, QTableWidgetItem, QTableView
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QTableView
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery, QSqlTableModel
 from FunctionWindow import FunctionWindow
 import numpy as np
