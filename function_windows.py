@@ -39,7 +39,7 @@ def connect_db():
     # return True
 
 def delete_from_db(db, what, item, conn):
-    command = "DELETE FROM %s WHERE %s = %s;"
+    command = 'DELETE FROM %s WHERE %s = %i;'
     cur = conn.cursor()
     cur.execute(command, (db, what, item))
 
@@ -169,6 +169,7 @@ class Producent(FunctionWindow):
         if cellContent == "Usuń":
             cur = self.conn.cursor()
             # print(self.data[item.row()][0])
+            # delete_from_db("producent", "id_producenta", self.data[item.row()][0], self.conn)
             cur.execute("DELETE FROM producent WHERE id_producenta = {};".format(self.data[item.row()][0]))
             self.conn.commit()
             cur.close()
@@ -223,7 +224,38 @@ class Zone(FunctionWindow):
     def __init__(self, conn):
         super(Zone, self).__init__()
         self.initialze_grid()
+
+        self.conn = conn
+        cur = self.conn.cursor()
+        cur.execute("Select * from strefa;")
+        self.data = cur.fetchall()
+        cur.close()
+        self.view.setColumnCount(2)
+        self.view.setHorizontalHeaderLabels(["Typ strefy", " "])
+        for item in self.data:
+            rows = self.view.rowCount()
+            self.view.setRowCount(rows + 1)
+            self.view.setItem(rows, 0, QTableWidgetItem(item[0]))
+            self.view.setItem(rows, 1, QTableWidgetItem("Usuń"))
+        self.view.resizeColumnsToContents()
+        self.get_signal()
+
         self.setup(pos, size/2, "Strefy")
+
+
+    def get_signal(self):
+        self.view.clicked.connect(self.func_test)
+
+    def func_test(self, item):
+        cellContent = item.data()
+        if cellContent == "Usuń":
+            cur = self.conn.cursor()
+            print(self.data[item.row()][0])
+            # delete_from_db("producent", "id_producenta", self.data[item.row()][0], self.conn)
+            cur.execute("DELETE FROM strefa WHERE typ_strefy = {};".format(self.data[item.row()][0]))
+            self.conn.commit()
+            cur.close()
+            self.close()
 
 
 class Where(FunctionWindow):
