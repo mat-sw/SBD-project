@@ -1,8 +1,11 @@
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QTableView
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery, QSqlTableModel
 from FunctionWindow import FunctionWindow
+import sys
 import numpy as np
 import psycopg2
+import pandas as pd
+# from sqlalchemy import create_engine
 
 DB_HOST = "localhost"
 DB_PORT = 5432
@@ -16,31 +19,21 @@ size = np.array([width, height])
 
 
 def connect_db():
-    conn = psycopg2.connect(database=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT)
-    print(conn)
+    conn = None
+    try:
+        # connect to the PostgreSQL server
+        print('Connecting to the PostgreSQL database...')
+        conn = psycopg2.connect(database=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT)
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+        sys.exit(1)
+    print("Connection successful")
     return conn
-    # do poprawy połączenie bo nie działa xd
-
-    # con = QSqlDatabase.addDatabase("QPSQL")
-    # con.setDatabaseName("DB_NAME")
-    # con.setHostName(DB_HOST)
-    # con.setUserName(DB_USER)
-    # con.setPort(DB_PORT)
-    # con.setPassword(DB_PASS)
-    # if not con.open():
-    #     print("dupa")
-    #     QMessageBox.critical(
-    #         None,
-    #         "QTableView Example - Error!",
-    #         "Database Error: %s" % con.lastError().databaseText(),
-    #         )
-    #     return False
-    # return True
 
 
 def delete_from_db(db, what, item, conn):
     cur = conn.cursor()
-    cur.execute("DELETE FROM %s WHERE %s = %s;" % (db, what, item))
+    cur.execute("DELETE FROM %s WHERE %s = '" % (db, what) + item +"';")
     conn.commit()
     cur.close()
 
@@ -91,6 +84,11 @@ class City(FunctionWindow):
             self.view.setItem(rows, 2, QTableWidgetItem(str(item[2])))
             self.view.setItem(rows, 3, QTableWidgetItem(str(item[3])))
             self.view.setItem(rows, 4, QTableWidgetItem("Usuń"))
+            # self.view.setItem(rows, 0, QTableWidgetItem(item))
+            # self.view.setItem(rows, 1, QTableWidgetItem(item))
+            # self.view.setItem(rows, 2, QTableWidgetItem(str(item)))
+            # self.view.setItem(rows, 3, QTableWidgetItem(str(item)))
+            # self.view.setItem(rows, 4, QTableWidgetItem("Usuń"))
         self.view.resizeColumnsToContents()
 
         self.setup(pos, size / 2, "Miasta")
@@ -148,28 +146,15 @@ class Producent(FunctionWindow):
             self.view.setItem(rows, 2, QTableWidgetItem("Usuń"))
         self.view.resizeColumnsToContents()
         self.get_signal()
-
-        # self.view.setColumnCount(2)
-        # self.view.setHorizontalHeaderLabels(["ID producenta", "Nazwa"])
-        # query = QSqlQuery()
-        # query.exec("""Select * from producent;""")
-        # while query.next():
-        #     rows = self.view.rowCount()
-        #     self.view.setRowCount(rows + 1)
-        #     self.view.setItem(rows, 0, QTableWidgetItem(str(query.value(0))))
-        #     self.view.setItem(rows, 1, QTableWidgetItem(query.value(1)))
-        # self.view.resizeColumnsToContents()
         self.setup(pos, size / 2, "Producenci")
-
-    def get_signal(self):
-        self.view.clicked.connect(self.func_test)
 
     def func_test(self, item):
         if item.data() == "Usuń":
             try:
                 delete_from_db("producent", "id_producenta", str(self.data[item.row()][0]), self.conn)
                 self.close()
-            except:
+            except (Exception, psycopg2.DatabaseError) as error:
+                print("Error: %s", error)
                 print("Cannot delete this record")
 
 
@@ -237,15 +222,13 @@ class Zone(FunctionWindow):
 
         self.setup(pos, size / 2, "Strefy")
 
-    def get_signal(self):
-        self.view.clicked.connect(self.func_test)
-
     def func_test(self, item):
         if item.data() == "Usuń":
             try:
-                delete_from_db("strefa", "typ_strefy", self.data[item.row()][0], self.conn)
+                delete_from_db("strefa", "typ_strefy",  self.data[item.row()][0], self.conn)
                 self.close()
-            except:
+            except (Exception, psycopg2.DatabaseError) as error:
+                print("Error: %s", error)
                 print("Cannot delete this record")
 
 
