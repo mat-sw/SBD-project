@@ -95,7 +95,7 @@
       <workItem from="1641156775116" duration="4235000" />
       <workItem from="1641161184372" duration="9604000" />
       <workItem from="1641197187366" duration="5600000" />
-      <workItem from="1641470601583" duration="5678000" />
+      <workItem from="1641470601583" duration="7716000" />
     </task>
     <task id="LOCAL-00001" summary="(main / login) window">
       <created>1639518277824</created>
@@ -230,7 +230,14 @@
       <option name="project" value="LOCAL" />
       <updated>1641205369160</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="poprawione usuwanie">
+      <created>1641478000471</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1641478000471</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -256,11 +263,12 @@
     <MESSAGE value="nocny commit" />
     <MESSAGE value="usunalem niepotrzebne importy" />
     <MESSAGE value="czasem działa czasem nie" />
-    <option name="LAST_COMMIT_MESSAGE" value="czasem działa czasem nie" />
+    <MESSAGE value="poprawione usuwanie" />
+    <option name="LAST_COMMIT_MESSAGE" value="poprawione usuwanie" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/main_windows_py$main.coverage" NAME="main Coverage Results" MODIFIED="1639990667950" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1641160776950" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/function_windows_py$main.coverage" NAME="main Coverage Results" MODIFIED="1641477918074" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/function_windows_py$main.coverage" NAME="main Coverage Results" MODIFIED="1641496523957" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

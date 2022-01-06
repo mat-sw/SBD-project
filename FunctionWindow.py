@@ -26,7 +26,7 @@ class FunctionWindow(QWidget):
         pass
 
     def get_signal(self):
-        self.view.clicked.connect(self.func_test)
+        self.view.clicked.connect(self.fun_del)
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Escape:
