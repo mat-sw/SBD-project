@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QTableView
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QTableView, QLineEdit, QPushButton
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery, QSqlTableModel
 from PyQt5.QtGui import QIcon
 from FunctionWindow import FunctionWindow
@@ -50,7 +50,7 @@ class Arrival(FunctionWindow):
     def __init__(self, conn):
         super(Arrival, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size / 2, "Przyjazdy")
+        self.setup(pos+50, size, "Przyjazdy")
 
 
 class Tickets(FunctionWindow):
@@ -58,19 +58,19 @@ class Tickets(FunctionWindow):
         super(Tickets, self).__init__()
         self.initialze_grid()
 
-        self.view.setColumnCount(2)
-        self.view.setHorizontalHeaderLabels(["ID biletu", "Ulgowy?"])
-        query = QSqlQuery()
-        query.exec("""SELECT id_typu_biletu, czy_ulgowy from bilet""")
+        # self.view.setColumnCount(2)
+        # self.view.setHorizontalHeaderLabels(["ID biletu", "Ulgowy?"])
+        # query = QSqlQuery()
+        # query.exec("""SELECT id_typu_biletu, czy_ulgowy from bilet""")
+        #
+        # while query.next():
+        #     rows = self.view.rowCount()
+        #     self.view.setRowCount(rows + 1)
+        #     self.view.setItem(rows, 0, QTableWidgetItem(str(query.value(0))))
+        #     self.view.setItem(rows, 1, QTableWidgetItem(query.value(1)))
+        # self.view.resizeColumnsToContents()
 
-        while query.next():
-            rows = self.view.rowCount()
-            self.view.setRowCount(rows + 1)
-            self.view.setItem(rows, 0, QTableWidgetItem(str(query.value(0))))
-            self.view.setItem(rows, 1, QTableWidgetItem(query.value(1)))
-        self.view.resizeColumnsToContents()
-
-        self.setup(pos, size / 2, "Bilety")
+        self.setup(pos+50, size, "Bilety")
 
 
 class City(FunctionWindow):
@@ -91,10 +91,18 @@ class City(FunctionWindow):
             self.view.setItem(rows, 2, QTableWidgetItem(str(item[2])))
             self.view.setItem(rows, 3, QTableWidgetItem(str(item[3])))
             self.view.setItem(rows, 4, QTableWidgetItem("Usuń"))
+
+        self.last_row = self.view.rowCount()
+        self.view.setRowCount(self.last_row + 1)
+        for i in range(len(self.labels)):
+            self.view.setCellWidget(self.last_row, i, QLineEdit())
+        self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
+
+
         self.view.resizeColumnsToContents()
         self.get_signal()
 
-        self.setup(pos, size / 2, "Miasta")
+        self.setup(pos+50, size, "Miasta")
 
     def fun_del(self, item):
         if item.data() == "Usuń":
@@ -104,44 +112,99 @@ class City(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
+                self.conn.rollback()
+
+    def add_to_db(self):
+        try:
+            item = self.view.cellWidget
+            print("Dodaj funckjonalnosc")
+            cur = self.conn.cursor()
+            # cur.execute("INSERT INTO miasto VALUES("+ item(self.last_row, 0).text() +", '"+ item(self.last_row, 1).text() +"');" )
+            self.conn.commit()
+            cur.close()
+            self.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+            self.conn.rollback()
 
 
 class Vehicle(FunctionWindow):
     def __init__(self, conn):
         super(Vehicle, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size / 2, "Pojazdy")
+        self.setup(pos+50, size, "Pojazdy")
 
 
 class Driver(FunctionWindow):
     def __init__(self, conn):
         super(Driver, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size / 2, "Kierowcy")
+
+        self.conn = conn
+        self.labels = ["Pesel", "Imie", "Nazwisko", "Płeć", "Czy prowadzi autbous", "Czy prowadzi tramwaj", "Wynagrodzenie", "Data zatrudnienia", "Stan_cywilny"]
+        self.data = select_from_db("kierowca", self.conn)
+        self.view.setColumnCount(len(self.labels)+1)
+        self.view.setHorizontalHeaderLabels(self.labels+[""])
+        for item in self.data:
+            rows = self.view.rowCount()
+            self.view.setRowCount(rows + 1)
+            self.view.setItem(rows, 0, QTableWidgetItem(item[0]))
+            self.view.setItem(rows, 1, QTableWidgetItem(item[1]))
+            self.view.setItem(rows, 2, QTableWidgetItem(item[2]))
+            self.view.setItem(rows, 3, QTableWidgetItem(item[3]))
+            self.view.setItem(rows, 4, QTableWidgetItem(item[4]))
+            self.view.setItem(rows, 5, QTableWidgetItem(item[5]))
+            self.view.setItem(rows, 6, QTableWidgetItem(str(item[6])))
+            self.view.setItem(rows, 7, QTableWidgetItem(str(item[7])))
+            self.view.setItem(rows, 8, QTableWidgetItem(item[8]))
+            self.view.setItem(rows, 9, QTableWidgetItem("Usuń"))
+
+        self.last_row = self.view.rowCount()
+        self.view.setRowCount(self.last_row + 1)
+        for i in range(len(self.labels)):
+            self.view.setCellWidget(self.last_row, i, QLineEdit())
+        self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
+
+
+        self.view.resizeColumnsToContents()
+        self.get_signal()
+        self.setup(pos+50, size, "Kierowcy")
+
+    def fun_del(self, item):
+        if item.data() == "Usuń":
+            try:
+                delete_from_db("kierowca", "pesel", self.data[item.row()][0], self.conn)
+                self.close()
+            except (Exception, psycopg2.DatabaseError) as error:
+                print("Error: %s", error)
+                print("Cannot delete this record")
+                self.conn.rollback()
+
+    def add_to_db(self):
+        try:
+            item = self.view.cellWidget
+            print("Dodaj funckjonalnosc")
+            cur = self.conn.cursor()
+            # cur.execute("INSERT INTO kierowca VALUES("+ item(self.last_row, 0).text() +", '"+ item(self.last_row, 1).text() +"');" )
+            self.conn.commit()
+            cur.close()
+            self.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+            self.conn.rollback()
 
 
 class Model(FunctionWindow):
     def __init__(self, conn):
         super(Model, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size / 2, "Modele")
+        self.setup(pos+50, size, "Modele")
 
 
 class Producent(FunctionWindow):
     def __init__(self, conn):
         super(Producent, self).__init__()
         self.initialze_grid()
-        # self.main_grid = QGridLayout()
-        # self.model = QSqlTableModel(self)
-        # self.model.setTable("producent")
-        # self.model.setEditStrategy(QSqlTableModel.OnFieldChange)
-        # self.model.setHeaderData(0, Qt.Horizontal, "id_producenta")
-        # self.model.setHeaderData(1, Qt.Horizontal, "nazwa_producenta")
-        # self.model.select()
-        # # Set up the view
-        # self.view = QTableView()
-        # self.view.setModel(self.model)
-        # self.view.resizeColumnsToContents()
 
         self.conn = conn
         self.labels = ["ID producenta", "Nazwa"]
@@ -154,9 +217,16 @@ class Producent(FunctionWindow):
             self.view.setItem(rows, 0, QTableWidgetItem(str(item[0])))
             self.view.setItem(rows, 1, QTableWidgetItem(item[1]))
             self.view.setItem(rows, 2, QTableWidgetItem("Usuń"))
+
+        self.last_row = self.view.rowCount()
+        self.view.setRowCount(self.last_row + 1)
+        for i in range(len(self.labels)):
+            self.view.setCellWidget(self.last_row, i, QLineEdit())
+        self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
+
         self.view.resizeColumnsToContents()
         self.get_signal()
-        self.setup(pos, size / 2, "Producenci")
+        self.setup(pos+50, size, "Producenci")
 
     def fun_del(self, item):
         if item.data() == "Usuń":
@@ -166,48 +236,61 @@ class Producent(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
+                self.conn.rollback()
+
+    def add_to_db(self):
+        try:
+            item = self.view.cellWidget
+            cur = self.conn.cursor()
+            cur.execute("INSERT INTO producent VALUES("+ item(self.last_row, 0).text() +", '"+ item(self.last_row, 1).text() +"');" )
+            self.conn.commit()
+            cur.close()
+            self.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+            self.conn.rollback()
 
 
 class TicketOffice(FunctionWindow):
     def __init__(self, conn):
         super(TicketOffice, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size / 2, "Kasy biletowe")
+        self.setup(pos+50, size, "Kasy biletowe")
 
 
 class Line(FunctionWindow):
     def __init__(self, conn):
         super(Line, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size / 2, "Linie")
+        self.setup(pos+50, size, "Linie")
 
 
 class Stop(FunctionWindow):
     def __init__(self, conn):
         super(Stop, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size / 2, "Przystanki")
+        self.setup(pos+50, size, "Przystanki")
 
 
 class StopsOrder(FunctionWindow):
     def __init__(self, conn):
         super(StopsOrder, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size / 2, "kolejność przystanków")
+        self.setup(pos+50, size, "kolejność przystanków")
 
 
 class TicketMachine(FunctionWindow):
     def __init__(self, conn):
         super(TicketMachine, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size / 2, "Biletomaty")
+        self.setup(pos+50, size, "Biletomaty")
 
 
 class TimeOfRide(FunctionWindow):
     def __init__(self, conn):
         super(TimeOfRide, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size / 2, "Czasy przejazdów")
+        self.setup(pos+50, size, "Czasy przejazdów")
 
 
 class Zone(FunctionWindow):
@@ -225,10 +308,16 @@ class Zone(FunctionWindow):
             self.view.setRowCount(rows + 1)
             self.view.setItem(rows, 0, QTableWidgetItem(item[0]))
             self.view.setItem(rows, 1, QTableWidgetItem("Usuń"))
+
+        self.last_row = self.view.rowCount()
+        self.view.setRowCount(self.last_row + 1)
+        for i in range(len(self.labels)):
+            self.view.setCellWidget(self.last_row, i, QLineEdit())
+        self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
+
         self.view.resizeColumnsToContents()
         self.get_signal()
-
-        self.setup(pos, size / 2, "Strefy")
+        self.setup(pos+50, size, "Strefy")
 
     def fun_del(self, item):
         if item.data() == "Usuń":
@@ -238,10 +327,25 @@ class Zone(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
+                self.conn.rollback()
+
+    def add_to_db(self):
+        try:
+            item = self.view.cellWidget
+            print(self.view.cellWidget(self.last_row, 0).text())
+            cur = self.conn.cursor()
+            cur.execute("INSERT INTO strefa VALUES('"+ item(self.last_row, 0).text() +"');")
+            self.conn.commit()
+            cur.close()
+            self.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+            self.conn.rollback()
+
 
 
 class Where(FunctionWindow):
     def __init__(self, conn):
         super(Where, self).__init__()
         self.initialze_grid()
-        self.setup(pos, size / 2, "Gdzie można kupić bilet")
+        self.setup(pos+50, size, "Gdzie można kupić bilet")
