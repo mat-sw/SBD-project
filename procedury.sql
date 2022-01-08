@@ -28,6 +28,15 @@ BEGIN
             UPDATE bilety SET cena = 8;
         END IF;
     END IF;
+    IF :NEW.strefa_typ_strefy LIKE 'B' THEN
+            UPDATE bilety SET cena = cena + 0.5;
+    ELSIF :NEW.strefa_typ_strefy LIKE 'C' THEN
+            UPDATE bilety SET cena = cena + 0.6;
+    ELSIF :NEW.strefa_typ_strefy LIKE 'AB' THEN
+            UPDATE bilety SET cena = cena + 0.7;
+    ELSIF :NEW.strefa_typ_strefy LIKE 'ABC' THEN
+            UPDATE bilety SET cena = cena + 1;
+    END IF;
 END;
 
 
