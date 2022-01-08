@@ -13,7 +13,8 @@ CREATE TABLE bilety (
     czas_przejazdu                ENUM('15', '30', '60') NOT NULL,
     do_zak_kasy_biletowe_id_kasy  INTEGER NOT NULL,
     do_zak_bil_id_biletomatu      INTEGER NOT NULL,
-    do_zak_id_biletu              INTEGER NOT NULL
+    do_zak_id_biletu              INTEGER NOT NULL,
+    strefa_typ_strefy             ENUM('A', 'B', 'C', 'AB', 'ABC') NOT NULL
 );
 
 CREATE UNIQUE INDEX bilet__idx ON
@@ -26,17 +27,6 @@ CREATE UNIQUE INDEX bilet__idx ON
     ASC );
 
 ALTER TABLE bilety ADD CONSTRAINT bilet_pk PRIMARY KEY ( id_typu_biletu );
-                                                     
-CREATE TABLE bilety_i_strefy (
-    strefa_typ_strefy      ENUM('A', 'B', 'C') NOT NULL,
-    bilet_id_typu_biletu   INTEGER NOT NULL,
-    bilet_czas_przejazdu1  ENUM('15', '30', '60') NOT NULL
-);
-
-ALTER TABLE bilety_i_strefy
-    ADD CONSTRAINT relation_20_pk PRIMARY KEY ( strefa_typ_strefy,
-                                                bilet_id_typu_biletu,
-                                                bilet_czas_przejazdu1 );
 
 CREATE TABLE do_zakupienia (
     bilety_id_typu_biletu     INTEGER NOT NULL,
@@ -70,7 +60,7 @@ CREATE TABLE kasy_biletowe (
     godzina_zamkniecia              DATE NOT NULL,
     przystanki_id_przystanku        INTEGER,
     przystanki_miasta_nazwa_miasta  VARCHAR(30),
-    przystanki_strefy_typ_strefy    ENUM('A', 'B', 'C') NOT NULL
+    przystanki_strefy_typ_strefy    ENUM('A', 'B', 'C', 'AB', 'ABC') NOT NULL
 );
 
 ALTER TABLE kasy_biletowe ADD CONSTRAINT kasa_biletowa_pk PRIMARY KEY ( id_kasy );
@@ -169,7 +159,7 @@ CREATE TABLE przyjazdy (
     pwl_przystanki_nazwa_miasta   VARCHAR(30) NOT NULL,
     id_przyjazdu                  INTEGER NOT NULL,
     data_przyjazdu                DATE NOT NULL,
-    pwl_przyst_strefy_typ_strefy  ENUM('A', 'B', 'C') NOT NULL
+    pwl_przyst_strefy_typ_strefy  ENUM('A', 'B', 'C', 'AB', 'ABC') NOT NULL
 );
 
 ALTER TABLE przyjazdy ADD CONSTRAINT przyjazd_pk PRIMARY KEY ( id_przyjazdu );
@@ -181,7 +171,7 @@ CREATE TABLE przystanki (
     miasta_nazwa_miasta       VARCHAR(30) NOT NULL,
     czy_zajezdnia             ENUM('t', 'n'),
     biletomaty_id_biletomatu  INTEGER NOT NULL,
-    strefy_typ_strefy         ENUM('A', 'B', 'C') NOT NULL
+    strefy_typ_strefy         ENUM('A', 'B', 'C', 'AB', 'ABC') NOT NULL
 );
 
 CREATE UNIQUE INDEX przystanek__idx ON
@@ -199,7 +189,7 @@ CREATE TABLE przystanki_w_linii (
     linie_id_linii                  INTEGER NOT NULL,
     przystanki_id_przystanku        INTEGER NOT NULL,
     przystanki_miasta_nazwa_miasta  VARCHAR(30) NOT NULL,
-    przystanki_strefy_typ_strefy    ENUM('A', 'B', 'C') NOT NULL
+    przystanki_strefy_typ_strefy    ENUM('A', 'B', 'C', 'AB', 'ABC') NOT NULL
 );
 
 ALTER TABLE przystanki_w_linii
@@ -210,10 +200,22 @@ ALTER TABLE przystanki_w_linii
                                                        przystanki_strefy_typ_strefy );
 
 CREATE TABLE strefy (
-    typ_strefy ENUM('A', 'B', 'C') NOT NULL
+    typ_strefy ENUM('A', 'B', 'C', 'AB', 'ABC') NOT NULL
 );
 
 ALTER TABLE strefy ADD CONSTRAINT strefa_pk PRIMARY KEY ( typ_strefy );
+
+ALTER TABLE bilety
+    ADD CONSTRAINT bilet_do_zakupienia_fk FOREIGN KEY ( do_zak_kasy_biletowe_id_kasy,
+                                                        do_zak_bil_id_biletomatu,
+                                                        do_zak_id_biletu )
+        REFERENCES do_zakupienia ( kasy_biletowe_id_kasy,
+                                   biletomaty_id_biletomatu,
+                                   id_biletu );
+
+ALTER TABLE bilety
+    ADD CONSTRAINT bilet_strefa_fk FOREIGN KEY ( strefa_typ_strefy )
+        REFERENCES strefy ( typ_strefy );
 
 ALTER TABLE do_zakupienia
     ADD CONSTRAINT do_zakupienia_biletomat_fk FOREIGN KEY ( biletomaty_id_biletomatu )
@@ -299,12 +301,3 @@ ALTER TABLE kierowcy_i_pojazdy
                              modele_poj_id_modelu,
                              modele_poj_prod_id_producenta );
 
-ALTER TABLE bilety_i_strefy
-    ADD CONSTRAINT relation_20_bilet_fk FOREIGN KEY ( bilet_id_typu_biletu,
-                                                      bilet_czas_przejazdu1 )
-        REFERENCES bilety ( id_typu_biletu,
-                            czas_przejazdu );
-
-ALTER TABLE bilety_i_strefy
-    ADD CONSTRAINT relation_20_strefa_fk FOREIGN KEY ( strefa_typ_strefy )
-        REFERENCES strefy ( typ_strefy );
