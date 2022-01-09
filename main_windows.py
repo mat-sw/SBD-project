@@ -1,5 +1,4 @@
-from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QPushButton, QWidget, \
-    QHBoxLayout, QLineEdit, QLabel, QMessageBox
+from PyQt5.QtWidgets import QVBoxLayout, QGridLayout, QPushButton, QWidget, QHBoxLayout, QLabel
 from PyQt5.QtCore import Qt, QSize
 from function_windows import *
 
@@ -82,7 +81,7 @@ class MainWindow(QWidget):
         self.add_buttons()
 
         for button in [self.bilet, self.gdzie, self.biletomat, self.kasa, self.pojazd, self.model,
-                       self.producent, self.kierowca, self.linia, self.przystanek, self.strefa, self.miasto, self.czasy, self.przyjazdy, self.kolejnosc]:
+                       self.producent, self.kierowca, self.linia, self.przystanek, self.strefa, self.miasto, self.przyjazdy, self.kolejnosc]:
             button.setStyleSheet("background-color: rgb(171, 195, 249); font-size : 9pt")
             button.setMinimumSize(QSize(160, 30))
 
@@ -95,8 +94,8 @@ class MainWindow(QWidget):
             self.my_grid.addWidget(button, 3, i, Qt.AlignCenter)
         for i, button in enumerate([self.linia, self.przystanek, self.strefa, self.miasto]):
             self.my_grid.addWidget(button, 4, i, Qt.AlignCenter)
-        for i, button in enumerate([self.czasy, self.przyjazdy, self.kolejnosc]):
-            self.my_grid.addWidget(button, 5, i, Qt.AlignCenter)
+        for i, button in enumerate([self.przyjazdy, self.kolejnosc]):
+            self.my_grid.addWidget(button, 5, i+1, Qt.AlignCenter)
 
         self.my_grid.setSpacing(20)
         self.choose()
@@ -122,7 +121,6 @@ class MainWindow(QWidget):
         self.kasa = QPushButton("Kasy biletowe", self)
         self.producent = QPushButton("Producenci pojazdu", self)
         self.gdzie = QPushButton("&Gdzie kupować bilet", self)
-        self.czasy = QPushButton("Czasy przejazdów", self)
         self.przyjazdy = QPushButton("Przyjazdy", self)
         self.kolejnosc = QPushButton("Kolejność przystanków", self)
 
@@ -138,19 +136,6 @@ class MainWindow(QWidget):
         else:
             self.infoLabel.setVisible(False)
 
-    def closeEvent(self, event):
-        self.wyloguj.setChecked(False)
-        odp = QMessageBox.question(
-            self, 'Komunikat',
-            "Czy na pewno chcesz się wylogować?",
-            QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-
-        if odp == QMessageBox.Yes:
-            self.goToLoginWindow()
-            event.accept()
-        else:
-            event.ignore()
-
     def choose(self):
         self.bilet.clicked.connect(self.goToTicketWindow)
         self.kierowca.clicked.connect(self.goToDriverWindow)
@@ -164,7 +149,6 @@ class MainWindow(QWidget):
         self.przystanek.clicked.connect(self.goToStopsWindow)
         self.strefa.clicked.connect(self.goToZonesWindow)
         self.miasto.clicked.connect(self.goToCityWindow)
-        self.czasy.clicked.connect(self.goToTimeRWindow)
         self.przyjazdy.clicked.connect(self.goToArrivalWindow)
         self.kolejnosc.clicked.connect(self.goToStopOrderWindow)
         self.wyloguj.clicked.connect(self.close)
@@ -175,47 +159,47 @@ class MainWindow(QWidget):
         self.window.show()
 
     def goToCityWindow(self):
-        self.window = City(self.conn)
+        self.window = Miasta(self.conn)
         self.window.show()
 
     def goToDriverWindow(self):
-        self.window = Driver(self.conn)
+        self.window = Kierowcy(self.conn)
         self.window.show()
 
     def goToLinesWindow(self):
-        self.window = Line(self.conn)
+        self.window = Linie(self.conn)
         self.window.show()
 
     def goToModelWindow(self):
-        self.window = Model(self.conn)
+        self.window = Modele(self.conn)
         self.window.show()
 
     def goToProducersWindow(self):
-        self.window = Producent(self.conn)
+        self.window = Producenci(self.conn)
         self.window.show()
 
     def goToStopsWindow(self):
-        self.window = Stop(self.conn)
+        self.window = Przystanki(self.conn)
         self.window.show()
 
     def goToTicketWindow(self):
-        self.window = Tickets(self.conn)
+        self.window = Bilety(self.conn)
         self.window.show()
 
     def goToTicketOfficeWindow(self):
-        self.window = TicketOffice(self.conn)
+        self.window = Kasy(self.conn)
         self.window.show()
 
     def goToTicketMachineWindow(self):
-        self.window = TicketMachine(self.conn)
+        self.window = Biletomaty(self.conn)
         self.window.show()
 
     def goToVehiclesWindow(self):
-        self.window = Vehicle(self.conn)
+        self.window = Pojazdy(self.conn)
         self.window.show()
 
     def goToWhereWindow(self):
-        self.window = Where(self.conn)
+        self.window = Gdzie(self.conn)
         self.window.show()
 
     def goToZonesWindow(self):
@@ -223,13 +207,9 @@ class MainWindow(QWidget):
         self.window.show()
 
     def goToArrivalWindow(self):
-        self.window = Arrival(self.conn)
-        self.window.show()
-
-    def goToTimeRWindow(self):
-        self.window = TimeOfRide(self.conn)
+        self.window = Przyjazdy(self.conn)
         self.window.show()
 
     def goToStopOrderWindow(self):
-        self.window = StopsOrder(self.conn)
+        self.window = Kolejnosc(self.conn)
         self.window.show()

@@ -7,7 +7,6 @@ class FunctionWindow(QWidget):
         super(FunctionWindow, self).__init__()
 
     def add_buttons(self):
-        # self.add = QPushButton("Dodaj nowy rekord", self)
         self.push_button = QPushButton("Dodaj")
         self.push_button.setCheckable(True)
 
@@ -27,7 +26,6 @@ class FunctionWindow(QWidget):
 
     def get_signal(self):
         self.view.clicked.connect(self.fun_del)
-        # self.add.clicked.connect(self.fun_add)
         self.push_button.clicked.connect(self.add_to_db)
 
     def keyPressEvent(self, e):
