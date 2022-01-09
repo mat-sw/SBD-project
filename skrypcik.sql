@@ -1,20 +1,27 @@
+CREATE TYPE t_n as ENUM('tak', 'nie');
+CREATE TYPE type_czas_przejazdu as ENUM('15', '30', '60');
+CREATE TYPE type_typ_strefy as ENUM ('A', 'B', 'C', 'AB', 'ABC');
+CREATE TYPE type_plec as ENUM('kobieta', 'mezczyzna');
+CREATE TYPE type_stan as ENUM('zonaty', 'zamezna', 'wdowiec', 'wdowa', 'panna', 'kawaler', 'rozwiedziony', 'rozwiedziona', 'w separacji');
+CREATE TYPE type_linia as ENUM('autobusowa', 'tramwajowa');
+
 CREATE TABLE biletomaty (
     id_biletomatu     INTEGER NOT NULL,
-    platnosc_gotowka  ENUM('t', 'n') NOT NULL,
-    platnosc_karta    ENUM('t', 'n') NOT NULL
+    platnosc_gotowka  t_n NOT NULL,
+    platnosc_karta    t_n NOT NULL
 );
 
 ALTER TABLE biletomaty ADD CONSTRAINT biletomat_pk PRIMARY KEY ( id_biletomatu );
 
 CREATE TABLE bilety (
     id_typu_biletu                INTEGER NOT NULL,
-    czy_ulgowy                    ENUM('t', 'n') NOT NULL,
+    czy_ulgowy                    t_n NOT NULL,
     cena                          FLOAT NOT NULL,
-    czas_przejazdu                ENUM('15', '30', '60') NOT NULL,
+    czas_przejazdu                type_czas_przejazdu NOT NULL,
     do_zak_kasy_biletowe_id_kasy  INTEGER NOT NULL,
     do_zak_bil_id_biletomatu      INTEGER NOT NULL,
     do_zak_id_biletu              INTEGER NOT NULL,
-    strefa_typ_strefy             ENUM('A', 'B', 'C', 'AB', 'ABC') NOT NULL
+    strefa_typ_strefy             type_typ_strefy NOT NULL
 );
 
 CREATE UNIQUE INDEX bilet__idx ON
@@ -34,7 +41,7 @@ CREATE TABLE do_zakupienia (
     kasy_biletowe_id_kasy     INTEGER NOT NULL,
     id_biletu                 INTEGER NOT NULL,
     data_zakupu               DATE,
-    czas_przejazdu            ENUM('15', '30', '60') NOT NULL
+    czas_przejazdu            type_czas_przejazdu NOT NULL
 );
 
 CREATE UNIQUE INDEX do_zakupienia__idx ON
@@ -60,7 +67,7 @@ CREATE TABLE kasy_biletowe (
     godzina_zamkniecia              DATE NOT NULL,
     przystanki_id_przystanku        INTEGER,
     przystanki_miasta_nazwa_miasta  VARCHAR(30),
-    przystanki_strefy_typ_strefy    ENUM('A', 'B', 'C', 'AB', 'ABC') NOT NULL
+    przystanki_strefy_typ_strefy    type_typ_strefy NOT NULL
 );
 
 ALTER TABLE kasy_biletowe ADD CONSTRAINT kasa_biletowa_pk PRIMARY KEY ( id_kasy );
@@ -69,12 +76,12 @@ CREATE TABLE kierowcy (
     pesel                   VARCHAR(11) NOT NULL,
     imie                    VARCHAR(20) NOT NULL,
     nazwisko                VARCHAR(30) NOT NULL,
-    plec                    ENUM('k', 'm')     NOT NULL,
-    uprawnienia_autobusowe  ENUM('t', 'n'),
-    uprawnienia_tramwajowe  ENUM('t', 'n'),
+    plec                    type_plec     NOT NULL,
+    uprawnienia_autobusowe  t_n,
+    uprawnienia_tramwajowe  t_n,
     placa                   FLOAT NOT NULL,
     data_zatrudnienia       DATE,
-    stan_cywilny            ENUM('zonaty', 'zamezna', 'wdowiec', 'wdowa', 'panna', 'kawaler', 'rozwiedziony', 'rozwiedziona', 'w separacji')
+    stan_cywilny            type_stan
 );
 
 ALTER TABLE kierowcy ADD CONSTRAINT kierowca_pk PRIMARY KEY ( pesel );
@@ -96,7 +103,7 @@ ALTER TABLE kierowcy_i_pojazdy
 
 CREATE TABLE linie (
     id_linii   INTEGER NOT NULL,
-    typ_linii  ENUM('autobusowa', 'tramwajowa') NOT NULL
+    typ_linii  type_linia NOT NULL
 );
 
 ALTER TABLE linie ADD CONSTRAINT linia_pk PRIMARY KEY ( id_linii );
@@ -114,7 +121,7 @@ CREATE TABLE modele_pojazdow (
     id_modelu                 INTEGER NOT NULL,
     nazwa_modelu              VARCHAR(30) NOT NULL,
     typ_pojazdu               VARCHAR(10) NOT NULL,
-    czy_niskopodlogowy        ENUM('t', 'n'),
+    czy_niskopodlogowy        t_n,
     liczba_miejsc_siedzacych  INTEGER,
     liczba_miejsc_stojacych   INTEGER,
     producenci_id_producenta  INTEGER NOT NULL
@@ -159,7 +166,7 @@ CREATE TABLE przyjazdy (
     pwl_przystanki_nazwa_miasta   VARCHAR(30) NOT NULL,
     id_przyjazdu                  INTEGER NOT NULL,
     data_przyjazdu                DATE NOT NULL,
-    pwl_przyst_strefy_typ_strefy  ENUM('A', 'B', 'C', 'AB', 'ABC') NOT NULL
+    pwl_przyst_strefy_typ_strefy  type_typ_strefy NOT NULL
 );
 
 ALTER TABLE przyjazdy ADD CONSTRAINT przyjazd_pk PRIMARY KEY ( id_przyjazdu );
@@ -169,9 +176,9 @@ CREATE TABLE przystanki (
     nazwa_przystanku          VARCHAR(30) NOT NULL,
     adres                     VARCHAR(30) NOT NULL,
     miasta_nazwa_miasta       VARCHAR(30) NOT NULL,
-    czy_zajezdnia             ENUM('t', 'n'),
+    czy_zajezdnia             t_n,
     biletomaty_id_biletomatu  INTEGER NOT NULL,
-    strefy_typ_strefy         ENUM('A', 'B', 'C', 'AB', 'ABC') NOT NULL
+    strefy_typ_strefy         type_typ_strefy NOT NULL
 );
 
 CREATE UNIQUE INDEX przystanek__idx ON
@@ -189,7 +196,7 @@ CREATE TABLE przystanki_w_linii (
     linie_id_linii                  INTEGER NOT NULL,
     przystanki_id_przystanku        INTEGER NOT NULL,
     przystanki_miasta_nazwa_miasta  VARCHAR(30) NOT NULL,
-    przystanki_strefy_typ_strefy    ENUM('A', 'B', 'C', 'AB', 'ABC') NOT NULL
+    przystanki_strefy_typ_strefy    type_typ_strefy NOT NULL
 );
 
 ALTER TABLE przystanki_w_linii
@@ -200,7 +207,7 @@ ALTER TABLE przystanki_w_linii
                                                        przystanki_strefy_typ_strefy );
 
 CREATE TABLE strefy (
-    typ_strefy ENUM('A', 'B', 'C', 'AB', 'ABC') NOT NULL
+    typ_strefy type_typ_strefy NOT NULL
 );
 
 ALTER TABLE strefy ADD CONSTRAINT strefa_pk PRIMARY KEY ( typ_strefy );
