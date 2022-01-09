@@ -33,3 +33,9 @@ insert into biletomaty VALUES(nextval('biletomat_seq'), 'tak', 'tak');
 insert into biletomaty VALUES(nextval('biletomat_seq'), 'nie', 'tak');
 insert into biletomaty VALUES(nextval('biletomat_seq'), 'tak', 'nie');
 insert into biletomaty VALUES(nextval('biletomat_seq'), 'tak', 'tak');
+
+--LINIE
+INSERT INTO linie VALUES(1, 'tramwajowa');
+INSERT INTO linie VALUES(2, 'tramwajowa');
+INSERT INTO linie VALUES(5, 'tramwajowa');
+INSERT INTO linie VALUES(168, 'autobusowa');
