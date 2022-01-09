@@ -12,6 +12,9 @@ VALUES('Rokietnica', 'wieś', 7523, 6.8);
 INSERT INTO MIASTA (nazwa_miasta, status, liczba_mieszkancow, powierzchnia) 
 VALUES('Swarzędz', 'miasto', 30739, 9);
 
+INSERT INTO MIASTA (nazwa_miasta, status, liczba_mieszkancow, powierzchnia) 
+VALUES('Przeźmierowo', 'wieś', 6455, 3.61);
+
 -- STREFY
 INSERT INTO STREFA VALUES('A');
 INSERT INTO STREFY VALUES('B');

@@ -40,7 +40,7 @@ def delete_from_db(db, what, item, conn):
 
 def select_from_db(table, conn):
     cur = conn.cursor()
-    cur.execute("Select * from %s;" % table)
+    cur.execute("Select * from %s ORDER By 1;" % table)
     data = cur.fetchall()
     cur.close()
     return data
@@ -90,7 +90,7 @@ class City(FunctionWindow):
             self.view.setItem(rows, 1, QTableWidgetItem(item[1]))
             self.view.setItem(rows, 2, QTableWidgetItem(str(item[2])))
             self.view.setItem(rows, 3, QTableWidgetItem(str(item[3])))
-            self.view.setItem(rows, 4, QTableWidgetItem(str(item[4])))
+            self.view.setItem(rows, 4, QTableWidgetItem(str(round(item[4], 2))))
             self.view.setItem(rows, 5, QTableWidgetItem("Usuń"))
 
         self.last_row = self.view.rowCount()
@@ -118,9 +118,10 @@ class City(FunctionWindow):
     def add_to_db(self):
         try:
             item = self.view.cellWidget
-            print("Dodaj funckjonalnosc")
+            row = self.last_row
             cur = self.conn.cursor()
-            # cur.execute("INSERT INTO miasto VALUES("+ item(self.last_row, 0).text() +", '"+ item(self.last_row, 1).text() +"');" )
+            cur.execute("INSERT INTO miasta (nazwa_miasta, status, liczba_mieszkancow, powierzchnia) "
+                        "VALUES('"+ item(row, 0).text() +"', '"+ item(row, 1).text()+"', "+ item(row, 2).text()+", "+ item(row, 3).text() +");")
             self.conn.commit()
             cur.close()
             self.close()
@@ -242,8 +243,9 @@ class Producent(FunctionWindow):
     def add_to_db(self):
         try:
             item = self.view.cellWidget
+            row = self.last_row
             cur = self.conn.cursor()
-            cur.execute("INSERT INTO producenci VALUES("+ item(self.last_row, 0).text() +", '"+ item(self.last_row, 1).text() +"');" )
+            cur.execute("INSERT INTO producenci VALUES("+ item(row, 0).text() +", '"+ item(row, 1).text() +"');" )
             self.conn.commit()
             cur.close()
             self.close()
@@ -263,7 +265,52 @@ class Line(FunctionWindow):
     def __init__(self, conn):
         super(Line, self).__init__()
         self.initialze_grid()
+
+        self.conn = conn
+        self.labels = ["ID linii", "Typ linii"]
+        self.data = select_from_db("linie", self.conn)
+        self.view.setColumnCount(len(self.labels)+1)
+        self.view.setHorizontalHeaderLabels(self.labels+[""])
+        for item in self.data:
+            rows = self.view.rowCount()
+            self.view.setRowCount(rows + 1)
+            self.view.setItem(rows, 0, QTableWidgetItem(str(item[0])))
+            self.view.setItem(rows, 1, QTableWidgetItem(item[1]))
+            self.view.setItem(rows, 2, QTableWidgetItem("Usuń"))
+
+        self.last_row = self.view.rowCount()
+        self.view.setRowCount(self.last_row + 1)
+        for i in range(len(self.labels)):
+            self.view.setCellWidget(self.last_row, i, QLineEdit())
+        self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
+
+        self.view.resizeColumnsToContents()
+        self.get_signal()
+
         self.setup(pos+50, size, "Linie")
+
+    def fun_del(self, item):
+        if item.data() == "Usuń":
+            try:
+                delete_from_db("linie", "id_linii", str(self.data[item.row()][0]), self.conn)
+                self.close()
+            except (Exception, psycopg2.DatabaseError) as error:
+                print("Error: %s", error)
+                print("Cannot delete this record")
+                self.conn.rollback()
+
+    def add_to_db(self):
+        try:
+            item = self.view.cellWidget
+            row = self.last_row
+            cur = self.conn.cursor()
+            cur.execute("INSERT INTO linie VALUES("+ item(row, 0).text() +", '"+ item(row, 1).text() +"');" )
+            self.conn.commit()
+            cur.close()
+            self.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+            self.conn.rollback()
 
 
 class Stop(FunctionWindow):
@@ -333,7 +380,6 @@ class Zone(FunctionWindow):
     def add_to_db(self):
         try:
             item = self.view.cellWidget
-            print(self.view.cellWidget(self.last_row, 0).text())
             cur = self.conn.cursor()
             cur.execute("INSERT INTO strefy VALUES('"+ item(self.last_row, 0).text() +"');")
             self.conn.commit()

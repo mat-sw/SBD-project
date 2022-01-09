@@ -33,3 +33,5 @@ class FunctionWindow(QWidget):
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Escape:
             self.close()
+        if e.key() == Qt.Key_Return:
+            self.add_to_db()
