@@ -79,8 +79,8 @@ class City(FunctionWindow):
         self.initialze_grid()
 
         self.conn = conn
-        self.labels = ["Nazwa", "Status", "Liczba mieszkańców", "Powierzchnia"]
-        self.data = select_from_db("miasto", self.conn)
+        self.labels = ["Nazwa", "Status", "Liczba mieszkańców", "Powierzchnia", "Gęstość"]
+        self.data = select_from_db("miasta", self.conn)
         self.view.setColumnCount(len(self.labels)+1)
         self.view.setHorizontalHeaderLabels(self.labels+[""])
         for item in self.data:
@@ -90,7 +90,8 @@ class City(FunctionWindow):
             self.view.setItem(rows, 1, QTableWidgetItem(item[1]))
             self.view.setItem(rows, 2, QTableWidgetItem(str(item[2])))
             self.view.setItem(rows, 3, QTableWidgetItem(str(item[3])))
-            self.view.setItem(rows, 4, QTableWidgetItem("Usuń"))
+            self.view.setItem(rows, 4, QTableWidgetItem(str(item[4])))
+            self.view.setItem(rows, 5, QTableWidgetItem("Usuń"))
 
         self.last_row = self.view.rowCount()
         self.view.setRowCount(self.last_row + 1)
@@ -107,7 +108,7 @@ class City(FunctionWindow):
     def fun_del(self, item):
         if item.data() == "Usuń":
             try:
-                delete_from_db("miasto", "nazwa_miasta",  self.data[item.row()][0], self.conn)
+                delete_from_db("miasta", "nazwa_miasta",  self.data[item.row()][0], self.conn)
                 self.close()
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
@@ -142,7 +143,7 @@ class Driver(FunctionWindow):
 
         self.conn = conn
         self.labels = ["Pesel", "Imie", "Nazwisko", "Płeć", "Czy prowadzi autbous", "Czy prowadzi tramwaj", "Wynagrodzenie", "Data zatrudnienia", "Stan_cywilny"]
-        self.data = select_from_db("kierowca", self.conn)
+        self.data = select_from_db("kierowcy", self.conn)
         self.view.setColumnCount(len(self.labels)+1)
         self.view.setHorizontalHeaderLabels(self.labels+[""])
         for item in self.data:
@@ -173,7 +174,7 @@ class Driver(FunctionWindow):
     def fun_del(self, item):
         if item.data() == "Usuń":
             try:
-                delete_from_db("kierowca", "pesel", self.data[item.row()][0], self.conn)
+                delete_from_db("kierowcy", "pesel", self.data[item.row()][0], self.conn)
                 self.close()
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
@@ -185,7 +186,7 @@ class Driver(FunctionWindow):
             item = self.view.cellWidget
             print("Dodaj funckjonalnosc")
             cur = self.conn.cursor()
-            # cur.execute("INSERT INTO kierowca VALUES("+ item(self.last_row, 0).text() +", '"+ item(self.last_row, 1).text() +"');" )
+            # cur.execute("INSERT INTO kierowcy VALUES("+ item(self.last_row, 0).text() +", '"+ item(self.last_row, 1).text() +"');" )
             self.conn.commit()
             cur.close()
             self.close()
@@ -208,7 +209,7 @@ class Producent(FunctionWindow):
 
         self.conn = conn
         self.labels = ["ID producenta", "Nazwa"]
-        self.data = select_from_db("producent", self.conn)
+        self.data = select_from_db("producenci", self.conn)
         self.view.setColumnCount(len(self.labels)+1)
         self.view.setHorizontalHeaderLabels(self.labels+[""])
         for item in self.data:
@@ -231,7 +232,7 @@ class Producent(FunctionWindow):
     def fun_del(self, item):
         if item.data() == "Usuń":
             try:
-                delete_from_db("producent", "id_producenta", str(self.data[item.row()][0]), self.conn)
+                delete_from_db("producenci", "id_producenta", str(self.data[item.row()][0]), self.conn)
                 self.close()
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
@@ -242,7 +243,7 @@ class Producent(FunctionWindow):
         try:
             item = self.view.cellWidget
             cur = self.conn.cursor()
-            cur.execute("INSERT INTO producent VALUES("+ item(self.last_row, 0).text() +", '"+ item(self.last_row, 1).text() +"');" )
+            cur.execute("INSERT INTO producenci VALUES("+ item(self.last_row, 0).text() +", '"+ item(self.last_row, 1).text() +"');" )
             self.conn.commit()
             cur.close()
             self.close()
@@ -300,7 +301,7 @@ class Zone(FunctionWindow):
 
         self.conn = conn
         self.labels = ["Typ strefy"]
-        self.data = select_from_db("strefa", self.conn)
+        self.data = select_from_db("strefy", self.conn)
         self.view.setColumnCount(len(self.labels)+1)
         self.view.setHorizontalHeaderLabels(self.labels+[" "])
         for item in self.data:
@@ -322,7 +323,7 @@ class Zone(FunctionWindow):
     def fun_del(self, item):
         if item.data() == "Usuń":
             try:
-                delete_from_db("strefa", "typ_strefy",  self.data[item.row()][0], self.conn)
+                delete_from_db("strefy", "typ_strefy",  self.data[item.row()][0], self.conn)
                 self.close()
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
@@ -334,7 +335,7 @@ class Zone(FunctionWindow):
             item = self.view.cellWidget
             print(self.view.cellWidget(self.last_row, 0).text())
             cur = self.conn.cursor()
-            cur.execute("INSERT INTO strefa VALUES('"+ item(self.last_row, 0).text() +"');")
+            cur.execute("INSERT INTO strefy VALUES('"+ item(self.last_row, 0).text() +"');")
             self.conn.commit()
             cur.close()
             self.close()
