@@ -5,7 +5,7 @@ from FunctionWindow import FunctionWindow
 import sys
 import numpy as np
 import psycopg2
-import pandas as pd
+# import pandas as pd
 
 DB_HOST = "localhost"
 DB_PORT = 5432
