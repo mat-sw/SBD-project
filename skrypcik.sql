@@ -1,9 +1,35 @@
+DROP TABLE biletomaty CASCADE;
+DROP TABLE bilety CASCADE;
+-- DROP TABLE do_zakupienia CASCADE;
+DROP TABLE kasy_biletowe CASCADE;
+DROP TABLE kierowcy CASCADE;
+DROP TABLE kierowcy_i_pojazdy CASCADE;
+DROP TABLE linie CASCADE;
+DROP TABLE miasta CASCADE;
+DROP TABLE modele_pojazdow CASCADE;
+DROP TABLE pojazdy CASCADE;
+DROP TABLE producenci CASCADE;
+DROP TABLE przyjazdy CASCADE;
+DROP TABLE przystanki CASCADE;
+DROP TABLE przystanki_w_linii CASCADE;
+DROP TABLE strefy CASCADE;
+
+DROP TYPE IF EXISTS t_n;
+DROP TYPE IF EXISTS type_czas_przejazdu;
+DROP TYPE IF EXISTS type_typ_strefy;
+DROP TYPE IF EXISTS type_plec;
+DROP TYPE IF EXISTS type_stan;
+DROP TYPE IF EXISTS type_linia;
+DROP TYPE IF EXISTS type_status;
+
+
 CREATE TYPE t_n as ENUM('tak', 'nie');
 CREATE TYPE type_czas_przejazdu as ENUM('15', '30', '60');
 CREATE TYPE type_typ_strefy as ENUM ('A', 'B', 'C', 'AB', 'ABC');
 CREATE TYPE type_plec as ENUM('kobieta', 'mezczyzna');
 CREATE TYPE type_stan as ENUM('zonaty', 'zamezna', 'wdowiec', 'wdowa', 'panna', 'kawaler', 'rozwiedziony', 'rozwiedziona', 'w separacji');
 CREATE TYPE type_linia as ENUM('autobusowa', 'tramwajowa');
+CREATE TYPE type_status as ENUM('miasto', 'wies');
 
 CREATE TABLE biletomaty (
     id_biletomatu     INTEGER NOT NULL,
@@ -14,52 +40,14 @@ CREATE TABLE biletomaty (
 ALTER TABLE biletomaty ADD CONSTRAINT biletomat_pk PRIMARY KEY ( id_biletomatu );
 
 CREATE TABLE bilety (
-    id_typu_biletu                INTEGER NOT NULL,
+    id_biletu                     INTEGER NOT NULL,
     czy_ulgowy                    t_n NOT NULL,
     cena                          FLOAT NOT NULL,
     czas_przejazdu                type_czas_przejazdu NOT NULL,
-    do_zak_kasy_biletowe_id_kasy  INTEGER NOT NULL,
-    do_zak_bil_id_biletomatu      INTEGER NOT NULL,
-    do_zak_id_biletu              INTEGER NOT NULL,
     strefa_typ_strefy             type_typ_strefy NOT NULL
 );
 
-CREATE UNIQUE INDEX bilet__idx ON
-    bilety (
-        do_zak_kasy_biletowe_id_kasy
-    ASC,
-        do_zak_bil_id_biletomatu
-    ASC,
-        do_zak_id_biletu
-    ASC );
-
-ALTER TABLE bilety ADD CONSTRAINT bilet_pk PRIMARY KEY ( id_typu_biletu );
-
-CREATE TABLE do_zakupienia (
-    bilety_id_typu_biletu     INTEGER NOT NULL,
-    biletomaty_id_biletomatu  INTEGER NOT NULL,
-    kasy_biletowe_id_kasy     INTEGER NOT NULL,
-    id_biletu                 INTEGER NOT NULL,
-    data_zakupu               DATE,
-    czas_przejazdu            type_czas_przejazdu NOT NULL
-);
-
-CREATE UNIQUE INDEX do_zakupienia__idx ON
-    do_zakupienia (
-        bilety_id_typu_biletu
-    ASC );
-
-CREATE UNIQUE INDEX do_zakupienia__idxv1 ON
-    do_zakupienia (
-        bilety_id_typu_biletu
-    ASC,
-        czas_przejazdu
-    ASC );
-
-ALTER TABLE do_zakupienia
-    ADD CONSTRAINT do_zakupienia_pk PRIMARY KEY ( kasy_biletowe_id_kasy,
-                                                  biletomaty_id_biletomatu,
-                                                  id_biletu );
+ALTER TABLE bilety ADD CONSTRAINT bilet_pk PRIMARY KEY ( id_biletu );
 
 CREATE TABLE kasy_biletowe (
     id_kasy                         INTEGER NOT NULL,
@@ -110,7 +98,7 @@ ALTER TABLE linie ADD CONSTRAINT linia_pk PRIMARY KEY ( id_linii );
 
 CREATE TABLE miasta (
     nazwa_miasta        VARCHAR(30) NOT NULL,
-    status              VARCHAR(10),
+    status              type_status,
     liczba_mieszkancow  INTEGER,
     powierzchnia        FLOAT
 );
@@ -213,24 +201,8 @@ CREATE TABLE strefy (
 ALTER TABLE strefy ADD CONSTRAINT strefa_pk PRIMARY KEY ( typ_strefy );
 
 ALTER TABLE bilety
-    ADD CONSTRAINT bilet_do_zakupienia_fk FOREIGN KEY ( do_zak_kasy_biletowe_id_kasy,
-                                                        do_zak_bil_id_biletomatu,
-                                                        do_zak_id_biletu )
-        REFERENCES do_zakupienia ( kasy_biletowe_id_kasy,
-                                   biletomaty_id_biletomatu,
-                                   id_biletu );
-
-ALTER TABLE bilety
     ADD CONSTRAINT bilet_strefa_fk FOREIGN KEY ( strefa_typ_strefy )
         REFERENCES strefy ( typ_strefy );
-
-ALTER TABLE do_zakupienia
-    ADD CONSTRAINT do_zakupienia_biletomat_fk FOREIGN KEY ( biletomaty_id_biletomatu )
-        REFERENCES biletomaty ( id_biletomatu );
-
-ALTER TABLE do_zakupienia
-    ADD CONSTRAINT do_zakupienia_kasa_biletowa_fk FOREIGN KEY ( kasy_biletowe_id_kasy )
-        REFERENCES kasy_biletowe ( id_kasy );
 
 ALTER TABLE kasy_biletowe
     ADD CONSTRAINT kasa_biletowa_przystanek_fk FOREIGN KEY ( przystanki_id_przystanku,
