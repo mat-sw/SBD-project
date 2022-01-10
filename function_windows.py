@@ -55,7 +55,6 @@ class Bilety(FunctionWindow):
         super(Bilety, self).__init__()
         self.initialze_grid()
 
-
         self.setup(pos + 50, size, "Bilety")
 
 
@@ -72,12 +71,8 @@ class Miasta(FunctionWindow):
         for item in self.data:
             rows = self.view.rowCount()
             self.view.setRowCount(rows + 1)
-            self.view.setItem(rows, 0, QTableWidgetItem(item[0]))
-            self.view.setItem(rows, 1, QTableWidgetItem(item[1]))
-            self.view.setItem(rows, 2, QTableWidgetItem(str(item[2])))
-            self.view.setItem(rows, 3, QTableWidgetItem(str(item[3])))
-            self.view.setItem(rows, 4, QTableWidgetItem(str(round(item[4], 2))))
-            self.view.setItem(rows, 5, QTableWidgetItem("Usuń"))
+            for i, _ in enumerate([item[0], item[1], str(item[2]), str(item[3]), str(round(item[4], 2)), "Usuń"]):
+                self.view.setItem(rows, i, QTableWidgetItem(_))
 
         self.last_row = self.view.rowCount()
         self.view.setRowCount(self.last_row + 1)
@@ -135,16 +130,8 @@ class Kierowcy(FunctionWindow):
         for item in self.data:
             rows = self.view.rowCount()
             self.view.setRowCount(rows + 1)
-            self.view.setItem(rows, 0, QTableWidgetItem(item[0]))
-            self.view.setItem(rows, 1, QTableWidgetItem(item[1]))
-            self.view.setItem(rows, 2, QTableWidgetItem(item[2]))
-            self.view.setItem(rows, 3, QTableWidgetItem(item[3]))
-            self.view.setItem(rows, 4, QTableWidgetItem(item[4]))
-            self.view.setItem(rows, 5, QTableWidgetItem(item[5]))
-            self.view.setItem(rows, 6, QTableWidgetItem(str(item[6])))
-            self.view.setItem(rows, 7, QTableWidgetItem(str(item[7])))
-            self.view.setItem(rows, 8, QTableWidgetItem(item[8]))
-            self.view.setItem(rows, 9, QTableWidgetItem("Usuń"))
+            for i, _ in enumerate([item[0], item[1], item[2], item[3], item[4], item[5], str(item[6]), str(item[7]), item[8], "Usuń"]):
+                self.view.setItem(rows, i, QTableWidgetItem(_))
 
         self.last_row = self.view.rowCount()
         self.view.setRowCount(self.last_row + 1)
@@ -184,6 +171,7 @@ class Kierowcy(FunctionWindow):
     def add_to_db(self):
         try:
             item = self.view.cellWidget
+            row = self.last_row
             print("Dodaj funckjonalnosc")
             cur = self.conn.cursor()
             # cur.execute("INSERT INTO kierowcy VALUES("+ item(self.last_row, 0).text() +", '"+ item(self.last_row, 1).text() +"');" )
@@ -208,14 +196,8 @@ class Modele(FunctionWindow):
         for item in self.data:
             rows = self.view.rowCount()
             self.view.setRowCount(rows + 1)
-            self.view.setItem(rows, 0, QTableWidgetItem(str(item[0])))
-            self.view.setItem(rows, 1, QTableWidgetItem(item[1]))
-            self.view.setItem(rows, 2, QTableWidgetItem(item[2]))
-            self.view.setItem(rows, 3, QTableWidgetItem(item[3]))
-            self.view.setItem(rows, 4, QTableWidgetItem(str(item[4])))
-            self.view.setItem(rows, 5, QTableWidgetItem(str(item[5])))
-            self.view.setItem(rows, 6, QTableWidgetItem(str(item[6])))
-            self.view.setItem(rows, 7, QTableWidgetItem("Usuń"))
+            for i, _ in enumerate([str(item[0]), item[1], item[2], item[3], str(item[4]), str(item[5]), str(item[6]), "Usuń"]):
+                self.view.setItem(rows, i, QTableWidgetItem(_))
 
         self.last_row = self.view.rowCount()
         self.view.setRowCount(self.last_row + 1)
@@ -264,8 +246,8 @@ class Modele(FunctionWindow):
             item = self.view.cellWidget
             row = self.last_row
             cur = self.conn.cursor()
-            cur.execute("INSERT INTO modele_pojazdow VALUES(NEXTVAL('model_seq'), '"+ item(row, 1).text() +"', '"+ item(row, 2).currentText() +"', '"+
-                        item(row, 3).currentText() +"', " + item(row, 4).text() + ", " + item(row, 5).text() + ", " + item(row, 6).currentText() + ");")
+            cur.execute("INSERT INTO modele_pojazdow VALUES(NEXTVAL('model_seq'), '" + item(row, 1).text() + "', '" + item(row, 2).currentText() + "', '" +
+                        item(row, 3).currentText() + "', " + item(row, 4).text() + ", " + item(row, 5).text() + ", " + item(row, 6).currentText() + ");")
             self.conn.commit()
             cur.close()
             self.close()
@@ -287,9 +269,8 @@ class Producenci(FunctionWindow):
         for item in self.data:
             rows = self.view.rowCount()
             self.view.setRowCount(rows + 1)
-            self.view.setItem(rows, 0, QTableWidgetItem(str(item[0])))
-            self.view.setItem(rows, 1, QTableWidgetItem(item[1]))
-            self.view.setItem(rows, 2, QTableWidgetItem("Usuń"))
+            for i, _ in enumerate([str(item[0]), item[1], "Usuń"]):
+                self.view.setItem(rows, i, QTableWidgetItem(_))
 
         self.last_row = self.view.rowCount()
         self.view.setRowCount(self.last_row + 1)
@@ -316,7 +297,7 @@ class Producenci(FunctionWindow):
             item = self.view.cellWidget
             row = self.last_row
             cur = self.conn.cursor()
-            cur.execute("INSERT INTO producenci VALUES(" + item(row, 0).text() + ", '" + item(row, 1).text() + "');")
+            cur.execute("INSERT INTO producenci VALUES(NEXTVAL('producer_seq'), '" + item(row, 1).text() + "');")
             self.conn.commit()
             cur.close()
             self.close()
