@@ -55,7 +55,68 @@ class Bilety(FunctionWindow):
         super(Bilety, self).__init__()
         self.initialze_grid()
 
+        self.conn = conn
+        self.labels = ["ID Biletu", "Czy ulgowy?", "Cena", "Czas przejazdu", "Strefa"]
+        self.data = select_from_db("bilety", self.conn)
+        self.view.setColumnCount(len(self.labels) + 2)
+        self.view.setHorizontalHeaderLabels(self.labels + [" ", " "])
+        for item in self.data:
+            rows = self.view.rowCount()
+            self.view.setRowCount(rows + 1)
+            for i, _ in enumerate([str(item[0]), item[1], str(item[2]), item[3], item[4], "Modyfikuj", "Usuń"]):
+                self.view.setItem(rows, i, QTableWidgetItem(_))
+
+        self.last_row = self.view.rowCount()
+        self.view.setRowCount(self.last_row + 1)
+
+        lista_tak_nie = QComboBox(self)
+        lista_tak_nie.addItems(['', 'tak', 'nie'])
+        self.view.setCellWidget(self.last_row, 1, lista_tak_nie)
+        lista_czas = QComboBox(self)
+        lista_czas.addItems(['', '15', '30', '60'])
+        self.view.setCellWidget(self.last_row, 3, lista_czas)
+        lista_strefy = QComboBox(self)
+        lista_strefy.addItems(['', 'A', 'B', 'C', 'AB', 'ABC'])
+        self.view.setCellWidget(self.last_row, 4, lista_strefy)
+        self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
+
+        self.view.resizeColumnsToContents()
+        self.get_signal()
         self.setup(pos + 50, size, "Bilety")
+
+    def modify(self, item):
+        if item.data() == "Usuń":
+            try:
+                delete_from_db("bilety", "id_biletu", str(self.data[item.row()][0]), self.conn)
+                self.close()
+            except (Exception, psycopg2.DatabaseError) as error:
+                print("Error: %s", error)
+                print("Cannot delete this record")
+                self.conn.rollback()
+        elif item.data() == "Modyfikuj":
+            try:
+                cur = self.conn.cursor()
+                cur.execute("UPDATE bilety SET id_biletu = " + self.view.item(item.row(), 0).text() + ", czy_ulgowy = '" + self.view.item(item.row(), 1).text() + "', cena = " + self.view.item(item.row(), 2).text() + ", "
+                             "czas_przejazdu = '" + self.view.item(item.row(), 3).text() + "', strefa_typ_strefy = '" + self.view.item(item.row(), 4).text() + "' WHERE id_biletu = " + str(self.data[item.row()][0]) + ";")
+                self.conn.commit()
+                cur.close()
+                self.close()
+            except(Exception, psycopg2.DatabaseError) as error:
+                print(error)
+                self.conn.rollback()
+
+    def add_to_db(self):
+        try:
+            item = self.view.cellWidget
+            row = self.last_row
+            cur = self.conn.cursor()
+            cur.execute("INSERT INTO bilety VALUES(NEXTVAL('bilet_seq'), '" + item(row, 1).currentText() + "', 0, '" + item(row, 3).currentText() + "', '" + item(row, 4).currentText() + "');")
+            self.conn.commit()
+            cur.close()
+            self.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+            self.conn.rollback()
 
 
 class Miasta(FunctionWindow):
@@ -64,14 +125,14 @@ class Miasta(FunctionWindow):
         self.initialze_grid()
 
         self.conn = conn
-        self.labels = ["Nazwa", "Status", "Liczba mieszkańców", "Powierzchnia", "Gęstość"]
+        self.labels = ["Nazwa", "Status", "Liczba mieszkańców", "Powierzchnia", "Gęstość zaludnienia"]
         self.data = select_from_db("miasta", self.conn)
-        self.view.setColumnCount(len(self.labels) + 1)
-        self.view.setHorizontalHeaderLabels(self.labels + [""])
+        self.view.setColumnCount(len(self.labels) + 2)
+        self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
             rows = self.view.rowCount()
             self.view.setRowCount(rows + 1)
-            for i, _ in enumerate([item[0], item[1], str(item[2]), str(item[3]), str(round(item[4], 2)), "Usuń"]):
+            for i, _ in enumerate([item[0], item[1], str(item[2]), str(item[3]), str(round(item[4], 2)), "Modyfikuj", "Usuń"]):
                 self.view.setItem(rows, i, QTableWidgetItem(_))
 
         self.last_row = self.view.rowCount()
@@ -85,7 +146,7 @@ class Miasta(FunctionWindow):
 
         self.setup(pos + 50, size, "Miasta")
 
-    def fun_del(self, item):
+    def modify(self, item):
         if item.data() == "Usuń":
             try:
                 delete_from_db("miasta", "nazwa_miasta", self.data[item.row()][0], self.conn)
@@ -93,6 +154,17 @@ class Miasta(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
+                self.conn.rollback()
+        elif item.data() == "Modyfikuj":
+            try:
+                cur = self.conn.cursor()
+                cur.execute("UPDATE miasta SET nazwa_miasta = '" + self.view.item(item.row(), 0).text() + "', status = '" + self.view.item(item.row(), 1).text() + "', liczba_mieszkancow = " + self.view.item(item.row(), 2).text() + ", "
+                             "powierzchnia = " + self.view.item(item.row(), 3).text() + ", gestosc_zaludnienia = " + self.view.item(item.row(), 4).text() + " WHERE nazwa_miasta = '" + self.data[item.row()][0] + "';")
+                self.conn.commit()
+                cur.close()
+                self.close()
+            except(Exception, psycopg2.DatabaseError) as error:
+                print(error)
                 self.conn.rollback()
 
     def add_to_db(self):
@@ -158,7 +230,7 @@ class Kierowcy(FunctionWindow):
         self.get_signal()
         self.setup(pos + 50, size, "Kierowcy")
 
-    def fun_del(self, item):
+    def modify(self, item):
         if item.data() == "Usuń":
             try:
                 delete_from_db("kierowcy", "pesel", self.data[item.row()][0], self.conn)
@@ -231,7 +303,7 @@ class Modele(FunctionWindow):
 
         self.setup(pos + 50, size, "Modele")
 
-    def fun_del(self, item):
+    def modify(self, item):
         if item.data() == "Usuń":
             try:
                 delete_from_db("modele_pojazdow", "id_modelu", self.data[item.row()][0], self.conn)
@@ -282,7 +354,7 @@ class Producenci(FunctionWindow):
         self.get_signal()
         self.setup(pos + 50, size, "Producenci")
 
-    def fun_del(self, item):
+    def modify(self, item):
         if item.data() == "Usuń":
             try:
                 delete_from_db("producenci", "id_producenta", str(self.data[item.row()][0]), self.conn)
@@ -326,9 +398,8 @@ class Linie(FunctionWindow):
         for item in self.data:
             rows = self.view.rowCount()
             self.view.setRowCount(rows + 1)
-            self.view.setItem(rows, 0, QTableWidgetItem(str(item[0])))
-            self.view.setItem(rows, 1, QTableWidgetItem(item[1]))
-            self.view.setItem(rows, 2, QTableWidgetItem("Usuń"))
+            for i, _ in enumerate([str(item[0]), item[1], "Usuń"]):
+                self.view.setItem(rows, i, QTableWidgetItem(_))
 
         self.last_row = self.view.rowCount()
         self.view.setRowCount(self.last_row + 1)
@@ -345,7 +416,7 @@ class Linie(FunctionWindow):
 
         self.setup(pos + 50, size, "Linie")
 
-    def fun_del(self, item):
+    def modify(self, item):
         if item.data() == "Usuń":
             try:
                 delete_from_db("linie", "id_linii", str(self.data[item.row()][0]), self.conn)
@@ -396,10 +467,8 @@ class Biletomaty(FunctionWindow):
         for item in self.data:
             rows = self.view.rowCount()
             self.view.setRowCount(rows + 1)
-            self.view.setItem(rows, 0, QTableWidgetItem(str(item[0])))
-            self.view.setItem(rows, 1, QTableWidgetItem(item[1]))
-            self.view.setItem(rows, 2, QTableWidgetItem(item[2]))
-            self.view.setItem(rows, 3, QTableWidgetItem("Usuń"))
+            for i, _ in enumerate([str(item[0]), item[1], item[2], "Usuń"]):
+                self.view.setItem(rows, i, QTableWidgetItem(_))
 
         self.last_row = self.view.rowCount()
         self.view.setRowCount(self.last_row + 1)
@@ -413,7 +482,7 @@ class Biletomaty(FunctionWindow):
         self.get_signal()
         self.setup(pos + 50, size, "Biletomaty")
 
-    def fun_del(self, item):
+    def modify(self, item):
         if item.data() == "Usuń":
             try:
                 delete_from_db("biletomaty", "id_biletomatu", str(self.data[item.row()][0]), self.conn)
@@ -464,7 +533,7 @@ class Zone(FunctionWindow):
         self.get_signal()
         self.setup(pos + 50, size, "Strefy")
 
-    def fun_del(self, item):
+    def modify(self, item):
         if item.data() == "Usuń":
             try:
                 delete_from_db("strefy", "typ_strefy", self.data[item.row()][0], self.conn)
@@ -487,8 +556,8 @@ class Zone(FunctionWindow):
             self.conn.rollback()
 
 
-class Gdzie(FunctionWindow):
+class KierowcyPojazdy(FunctionWindow):
     def __init__(self, conn):
-        super(Gdzie, self).__init__()
+        super(KierowcyPojazdy, self).__init__()
         self.initialze_grid()
-        self.setup(pos + 50, size, "Gdzie można kupić bilet")
+        self.setup(pos + 50, size, "Kierowcy a pojazdy")

@@ -25,7 +25,7 @@ class FunctionWindow(QWidget):
         pass
 
     def get_signal(self):
-        self.view.clicked.connect(self.fun_del)
+        self.view.clicked.connect(self.modify)
         self.push_button.clicked.connect(self.add_to_db)
 
     def keyPressEvent(self, e):

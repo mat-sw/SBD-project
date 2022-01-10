@@ -100,7 +100,8 @@ CREATE TABLE miasta (
     nazwa_miasta        VARCHAR(30) NOT NULL,
     status              type_status,
     liczba_mieszkancow  INTEGER,
-    powierzchnia        FLOAT
+    powierzchnia        FLOAT,
+	gestosc_zaludnienia	FLOAT
 );
 
 ALTER TABLE miasta ADD CONSTRAINT miasto_pk PRIMARY KEY ( nazwa_miasta );

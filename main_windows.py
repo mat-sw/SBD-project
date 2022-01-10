@@ -49,17 +49,6 @@ class LoginWindow(QWidget):
         else:
             self.infoLabel.setVisible(False)
 
-    # def closeEvent(self, event):
-    #     odp = QMessageBox.question(
-    #         self, 'Komunikat',
-    #         "Czy na pewno chcesz wyjść?",
-    #         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-    #
-    #     if odp == QMessageBox.Yes:
-    #         event.accept()
-    #     else:
-    #         event.ignore()
-
     def authorize(self):
         if self.loginLine.text() == 'admin' and self.passLine.text() == 'admin':
             conn = connect_db()
@@ -80,7 +69,7 @@ class MainWindow(QWidget):
         self.my_grid = QGridLayout()
         self.add_buttons()
 
-        for button in [self.bilet, self.gdzie, self.biletomat, self.kasa, self.pojazd, self.model,
+        for button in [self.bilet, self.kierowcy_pojazdy, self.biletomat, self.kasa, self.pojazd, self.model,
                        self.producent, self.kierowca, self.linia, self.przystanek, self.strefa, self.miasto, self.przyjazdy, self.kolejnosc]:
             button.setStyleSheet("background-color: rgb(171, 195, 249); font-size : 9pt")
             button.setMinimumSize(QSize(160, 30))
@@ -88,14 +77,9 @@ class MainWindow(QWidget):
         self.my_grid.addWidget(self.wyloguj, 0, 3, Qt.AlignCenter)
         self.my_grid.addWidget(self.info_label, 1, 0, 1, 4, Qt.AlignHCenter)
 
-        for i, button in enumerate([self.bilet, self.gdzie, self.biletomat, self.kasa]):
-            self.my_grid.addWidget(button, 2, i, Qt.AlignCenter)
-        for i, button in enumerate([self.pojazd, self.model, self.producent, self.kierowca]):
-            self.my_grid.addWidget(button, 3, i, Qt.AlignCenter)
-        for i, button in enumerate([self.linia, self.przystanek, self.strefa, self.miasto]):
-            self.my_grid.addWidget(button, 4, i, Qt.AlignCenter)
-        for i, button in enumerate([self.przyjazdy, self.kolejnosc]):
-            self.my_grid.addWidget(button, 5, i+1, Qt.AlignCenter)
+        for i, button in enumerate([self.bilet, self.biletomat, self.kasa, self.kierowcy_pojazdy, self.model, self.producent, self.pojazd, self.kierowca,
+                                    self.linia, self.przystanek, self.strefa, self.miasto, self.przyjazdy, self.kolejnosc]):
+            self.my_grid.addWidget(button, int(i/4) + 2, i % 4, Qt.AlignCenter)
 
         self.my_grid.setSpacing(20)
         self.choose()
@@ -120,7 +104,7 @@ class MainWindow(QWidget):
         self.biletomat = QPushButton("Biletomaty", self)
         self.kasa = QPushButton("Kasy biletowe", self)
         self.producent = QPushButton("Producenci pojazdu", self)
-        self.gdzie = QPushButton("&Gdzie kupować bilet", self)
+        self.kierowcy_pojazdy = QPushButton("Kierowcy a pojazdy", self)
         self.przyjazdy = QPushButton("Przyjazdy", self)
         self.kolejnosc = QPushButton("Kolejność przystanków", self)
 
@@ -139,7 +123,7 @@ class MainWindow(QWidget):
     def choose(self):
         self.bilet.clicked.connect(self.goToTicketWindow)
         self.kierowca.clicked.connect(self.goToDriverWindow)
-        self.gdzie.clicked.connect(self.goToWhereWindow)
+        self.kierowcy_pojazdy.clicked.connect(self.goToDVWindow)
         self.biletomat.clicked.connect(self.goToTicketMachineWindow)
         self.kasa.clicked.connect(self.goToTicketOfficeWindow)
         self.pojazd.clicked.connect(self.goToVehiclesWindow)
@@ -151,7 +135,7 @@ class MainWindow(QWidget):
         self.miasto.clicked.connect(self.goToCityWindow)
         self.przyjazdy.clicked.connect(self.goToArrivalWindow)
         self.kolejnosc.clicked.connect(self.goToStopOrderWindow)
-        self.wyloguj.clicked.connect(self.close)
+        self.wyloguj.clicked.connect(self.goToLoginWindow)
 
     def goToLoginWindow(self):
         self.window = LoginWindow()
@@ -198,8 +182,8 @@ class MainWindow(QWidget):
         self.window = Pojazdy(self.conn)
         self.window.show()
 
-    def goToWhereWindow(self):
-        self.window = Gdzie(self.conn)
+    def goToDVWindow(self):
+        self.window = KierowcyPojazdy(self.conn)
         self.window.show()
 
     def goToZonesWindow(self):
