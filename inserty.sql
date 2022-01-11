@@ -39,3 +39,6 @@ INSERT INTO linie VALUES(1, 'tramwajowa');
 INSERT INTO linie VALUES(2, 'tramwajowa');
 INSERT INTO linie VALUES(5, 'tramwajowa');
 INSERT INTO linie VALUES(168, 'autobusowa');
+
+--MODELE
+INSERT INTO modele_pojazdow VALUES(999, 'Tramino', 'tramwaj', 'tak', 78, 276, 1);

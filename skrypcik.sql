@@ -1,6 +1,5 @@
 DROP TABLE biletomaty CASCADE;
 DROP TABLE bilety CASCADE;
--- DROP TABLE do_zakupienia CASCADE;
 DROP TABLE kasy_biletowe CASCADE;
 DROP TABLE kierowcy CASCADE;
 DROP TABLE kierowcy_i_pojazdy CASCADE;
@@ -25,7 +24,7 @@ DROP TYPE IF EXISTS type_status;
 
 CREATE TYPE t_n as ENUM('tak', 'nie');
 CREATE TYPE type_czas_przejazdu as ENUM('15', '30', '60');
-CREATE TYPE type_typ_strefy as ENUM ('A', 'B', 'C', 'AB', 'ABC');
+CREATE TYPE type_typ_strefy as ENUM('A', 'B', 'C', 'AB', 'ABC');
 CREATE TYPE type_plec as ENUM('kobieta', 'mezczyzna');
 CREATE TYPE type_stan as ENUM('zonaty', 'zamezna', 'wdowiec', 'wdowa', 'panna', 'kawaler', 'rozwiedziony', 'rozwiedziona', 'w separacji');
 CREATE TYPE type_linia as ENUM('autobusowa', 'tramwajowa');
@@ -123,7 +122,7 @@ CREATE TABLE pojazdy (
     id_pojazdu                     INTEGER NOT NULL,
     max_liczba_osob                INTEGER,
     linie_id_linii                 INTEGER NOT NULL,
-    biletomaty_id_biletomatu       INTEGER NOT NULL,
+    biletomaty_id_biletomatu       INTEGER,
     rok_produkcji                  INTEGER,
     data_waznosci_przegladu        DATE NOT NULL,
     modele_poj_id_modelu           INTEGER NOT NULL,
@@ -166,7 +165,7 @@ CREATE TABLE przystanki (
     adres                     VARCHAR(30) NOT NULL,
     miasta_nazwa_miasta       VARCHAR(30) NOT NULL,
     czy_zajezdnia             t_n,
-    biletomaty_id_biletomatu  INTEGER NOT NULL,
+    biletomaty_id_biletomatu  INTEGER,
     strefy_typ_strefy         type_typ_strefy NOT NULL
 );
 
