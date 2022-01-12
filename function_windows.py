@@ -35,9 +35,9 @@ def delete_from_db(db, what, item, conn):
     cur.close()
 
 
-def select_from_db(table, conn):
+def select_from_db(what, table, conn):
     cur = conn.cursor()
-    cur.execute("Select * from %s ORDER By 1;" % table)
+    cur.execute("Select %s from %s ORDER By 1;" % (what, table))
     data = cur.fetchall()
     cur.close()
     return data
@@ -57,7 +57,7 @@ class Bilety(FunctionWindow):
 
         self.conn = conn
         self.labels = ["ID Biletu", "Czy ulgowy?", "Cena", "Czas przejazdu", "Strefa"]
-        self.data = select_from_db("bilety", self.conn)
+        self.data = select_from_db("*", "bilety", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + [" ", " "])
         for item in self.data:
@@ -126,7 +126,7 @@ class Miasta(FunctionWindow):
 
         self.conn = conn
         self.labels = ["Nazwa", "Status", "Liczba mieszkańców", "Powierzchnia", "Gęstość zaludnienia"]
-        self.data = select_from_db("miasta", self.conn)
+        self.data = select_from_db("*", "miasta", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
@@ -137,7 +137,7 @@ class Miasta(FunctionWindow):
 
         self.last_row = self.view.rowCount()
         self.view.setRowCount(self.last_row + 1)
-        for i in range(len(self.labels)):
+        for i in range(len(self.labels)-1):
             self.view.setCellWidget(self.last_row, i, QLineEdit())
         self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
 
@@ -189,7 +189,7 @@ class Pojazdy(FunctionWindow):
 
         self.conn = conn
         self.labels = ["ID pojazdu", "Max liczba osob", "ID Linii", "ID biletomatu", "Rok produkcji", "Data waznosci przegladu", "ID modelu", "ID producenta"]
-        self.data = select_from_db("pojazdy", self.conn)
+        self.data = select_from_db("*", "pojazdy", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
@@ -200,7 +200,31 @@ class Pojazdy(FunctionWindow):
 
         self.last_row = self.view.rowCount()
         self.view.setRowCount(self.last_row + 1)
-        for i in range(len(self.labels)):
+        for i in range(2, len(self.labels)-1):
+            if i == 2:
+                lista_linie = QComboBox(self)
+                ids = select_from_db("id_linii", "linie", conn)
+                lista_linie.addItem("")
+                for item in ids:
+                    lista_linie.addItem(str(item[0]))
+                self.view.setCellWidget(self.last_row, i, lista_linie)
+                continue
+            if i == 3:
+                lista_biletomaty = QComboBox(self)
+                ids = select_from_db("id_biletomatu", "biletomaty", conn)
+                lista_biletomaty.addItem("")
+                for item in ids:
+                    lista_biletomaty.addItem(str(item[0]))
+                self.view.setCellWidget(self.last_row, i, lista_biletomaty)
+                continue
+            if i == 6:
+                lista_modele = QComboBox(self)
+                ids = select_from_db("id_modelu", "modele_pojazdow", conn)
+                lista_modele.addItem("")
+                for item in ids:
+                    lista_modele.addItem(str(item[0]))
+                self.view.setCellWidget(self.last_row, i, lista_modele)
+                continue
             self.view.setCellWidget(self.last_row, i, QLineEdit())
         self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
 
@@ -219,13 +243,12 @@ class Pojazdy(FunctionWindow):
                 print("Cannot delete this record")
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
-            # TODO dane do poprawy
             try:
                 cur = self.conn.cursor()
-                cur.execute("UPDATE pojazdy SET nazwa_miasta = '" + self.view.item(item.row(), 0).text() + "', imie = '" + self.view.item(item.row(), 1).text() + "', nazwisko = '" + self.view.item(item.row(), 2).text() + "', "
-                            "plec = '" + self.view.item(item.row(), 3).text() + "', uprawnienia_autobusowe = '" + self.view.item(item.row(), 4).text() + "'"
-                            ", uprawnienia_tramwajowe = '" + self.view.item(item.row(), 5).text() + "', placa = " + self.view.item(item.row(), 6).text() +
-                            ", data_zatrudnienia = to_date('" + self.view.item(item.row(), 7).text() + "', 'YYYY-MM-DD'), stan_cywilny = '" + self.view.item(item.row(), 8).text() + "' WHERE pesel = '" + self.data[item.row()][0] + "';")
+                cur.execute("UPDATE pojazdy SET id_pojazdu = " + self.view.item(item.row(), 0).text() + ", max_liczba_osob = (SELECT sum_sits("+ self.view.item(item.row(), 6).text() + ")), linie_id_linii = " + self.view.item(item.row(), 2).text() +
+                            ", biletomaty_id_biletomatu = " + self.view.item(item.row(), 3).text() + ", rok_produkcji = " + self.view.item(item.row(), 4).text() +
+                            ", data_waznosci_przegladu = to_date('" + self.view.item(item.row(), 5).text() + "', 'YYYY-MM-DD'), modele_poj_id_modelu = " + self.view.item(item.row(), 6).text() +
+                            ", modele_poj_prod_id_producenta = " + self.view.item(item.row(), 7).text() + " WHERE id_pojazdu = " + str(self.data[item.row()][0]) + ";")
                 self.conn.commit()
                 cur.close()
                 self.close()
@@ -237,10 +260,9 @@ class Pojazdy(FunctionWindow):
         try:
             item = self.view.cellWidget
             row = self.last_row
-            # TODO poprawa danych
             cur = self.conn.cursor()
-            cur.execute("INSERT INTO pojazdy VALUES(NEXTVAL('pojazd_seq'), "+ item(row, 1).text() +", "+ item(row, 2).text() +", "+ item(row, 3).currentText() +", "+ item(row, 4).currentText() +
-                        ", to_date('"+ item(row, 5).text() +"', 'YYYY-MM-DD'), "+ item(row, 6).text() +", "+ item(row, 7).text() +");" )
+            cur.execute("INSERT INTO pojazdy VALUES(NEXTVAL('pojazd_seq'), (SELECT sum_sits("+ item(row, 6).currentText() + ")), "+ item(row, 2).currentText() +", "+ item(row, 3).currentText() +", "+ item(row, 4).text() +
+                        ", to_date('"+ item(row, 5).text() +"', 'YYYY-MM-DD'), "+ item(row, 6).currentText() +", (SELECT producenci_id_producenta FROM modele_pojazdow WHERE id_modelu = "+ item(row, 6).currentText() +"));" )
             self.conn.commit()
             cur.close()
             self.close()
@@ -256,7 +278,7 @@ class Kierowcy(FunctionWindow):
 
         self.conn = conn
         self.labels = ["Pesel", "Imie", "Nazwisko", "Płeć", "Czy prowadzi autbous", "Czy prowadzi tramwaj", "Wynagrodzenie", "Data zatrudnienia", "Stan_cywilny"]
-        self.data = select_from_db("kierowcy", self.conn)
+        self.data = select_from_db("*", "kierowcy", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
@@ -336,7 +358,7 @@ class Modele(FunctionWindow):
 
         self.conn = conn
         self.labels = ["ID Modelu", "Nazwa Modelu", "Typ pojazdu", "Czy niskopodłogowy", "Miejsca siedzące", "Miejsca stojące", "ID producenta"]
-        self.data = select_from_db("modele_pojazdow", self.conn)
+        self.data = select_from_db("*", "modele_pojazdow", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
@@ -360,10 +382,7 @@ class Modele(FunctionWindow):
                 continue
             if i == 6:
                 lista_prod = QComboBox(self)
-                cur = conn.cursor()
-                cur.execute("SELECT id_producenta FROM producenci")
-                ids = cur.fetchall()
-                cur.close()
+                ids = select_from_db("id_producenta", "producenci", conn)
                 lista_prod.addItem("")
                 for item in ids:
                     lista_prod.addItem(str(item[0]))
@@ -421,7 +440,7 @@ class Producenci(FunctionWindow):
 
         self.conn = conn
         self.labels = ["ID producenta", "Nazwa"]
-        self.data = select_from_db("producenci", self.conn)
+        self.data = select_from_db("*", "producenci", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
@@ -432,7 +451,7 @@ class Producenci(FunctionWindow):
 
         self.last_row = self.view.rowCount()
         self.view.setRowCount(self.last_row + 1)
-        for i in range(len(self.labels)):
+        for i in range(1, len(self.labels)):
             self.view.setCellWidget(self.last_row, i, QLineEdit())
         self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
 
@@ -488,7 +507,7 @@ class Linie(FunctionWindow):
 
         self.conn = conn
         self.labels = ["ID linii", "Typ linii"]
-        self.data = select_from_db("linie", self.conn)
+        self.data = select_from_db("*", "linie", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
@@ -567,7 +586,7 @@ class Biletomaty(FunctionWindow):
 
         self.conn = conn
         self.labels = ["ID Biletomatu", "Płatność gotówką", "Płatność kartą"]
-        self.data = select_from_db("biletomaty", self.conn)
+        self.data = select_from_db("*", "biletomaty", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["",""])
         for item in self.data:
@@ -630,14 +649,15 @@ class Zone(FunctionWindow):
 
         self.conn = conn
         self.labels = ["Typ strefy"]
-        self.data = select_from_db("strefy", self.conn)
-        self.view.setColumnCount(len(self.labels) + 1)
-        self.view.setHorizontalHeaderLabels(self.labels + [" "])
+        self.data = select_from_db("*", "strefy", self.conn)
+        self.view.setColumnCount(len(self.labels) + 2)
+        self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
             rows = self.view.rowCount()
             self.view.setRowCount(rows + 1)
             self.view.setItem(rows, 0, QTableWidgetItem(item[0]))
-            self.view.setItem(rows, 1, QTableWidgetItem("Usuń"))
+            self.view.setItem(rows, 1, QTableWidgetItem("Modyfikuj"))
+            self.view.setItem(rows, 2, QTableWidgetItem("Usuń"))
 
         self.last_row = self.view.rowCount()
         self.view.setRowCount(self.last_row + 1)
@@ -659,6 +679,16 @@ class Zone(FunctionWindow):
                 print("Error: %s", error)
                 print("Cannot delete this record")
                 self.conn.rollback()
+        elif item.data() == "Modyfikuj":
+            try:
+                cur = self.conn.cursor()
+                cur.execute("UPDATE strefy SET tyo_strefy = '" + self.view.item(item.row(), 0).text() + "' WHERE typ_strefy = " + self.data[item.row()][0] + ";")
+                self.conn.commit()
+                cur.close()
+                self.close()
+            except(Exception, psycopg2.DatabaseError) as error:
+                print(error)
+                self.conn.rollback()
 
     def add_to_db(self):
         try:
@@ -677,4 +707,70 @@ class KierowcyPojazdy(FunctionWindow):
     def __init__(self, conn):
         super(KierowcyPojazdy, self).__init__()
         self.initialze_grid()
+
+        self.conn = conn
+        self.labels = ["ID Pojazdu", "ID Linii", "ID Modelu", "ID producenta", "Pesel kierowcy"]
+        self.data = select_from_db("*", "kierowcy_i_pojazdy", self.conn)
+        self.view.setColumnCount(len(self.labels) + 2)
+        self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
+        for item in self.data:
+            rows = self.view.rowCount()
+            self.view.setRowCount(rows + 1)
+            for i, _ in enumerate([str(item[0]), str(item[1]), str(item[2]), str(item[3]), item[4], "Modyfikuj", "Usuń"]):
+                self.view.setItem(rows, i, QTableWidgetItem(_))
+
+        self.last_row = self.view.rowCount()
+        self.view.setRowCount(self.last_row + 1)
+
+        lista_pojazdy = QComboBox(self)
+        ids = select_from_db("id_pojazdu", "pojazdy", conn)
+        lista_pojazdy.addItem("")
+        for item in ids:
+            lista_pojazdy.addItem(str(item[0]))
+        self.view.setCellWidget(self.last_row, 0, lista_pojazdy)
+
+        lista_pesele = QComboBox(self)
+        pesele = select_from_db("pesel", "kierowcy", conn)
+        print("kp")
+        lista_pesele.addItem("")
+        for item in pesele:
+            lista_pesele.addItem(item[0])
+        self.view.setCellWidget(self.last_row, 4, lista_pesele)
+
+        self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
+
+        self.view.resizeColumnsToContents()
+        self.get_signal()
         self.setup(pos + 50, size, "Kierowcy a pojazdy")
+
+    def modify(self, item):
+        if item.data() == "Usuń":
+            try:
+                delete_from_db("strefy", "typ_strefy", self.data[item.row()][0], self.conn)
+                self.close()
+            except (Exception, psycopg2.DatabaseError) as error:
+                print("Error: %s", error)
+                print("Cannot delete this record")
+                self.conn.rollback()
+        elif item.data() == "Modyfikuj":
+            try:
+                cur = self.conn.cursor()
+                cur.execute("UPDATE strefy SET tyo_strefy = '" + self.view.item(item.row(), 0).text() + "' WHERE typ_strefy = " + self.data[item.row()][0] + ";")
+                self.conn.commit()
+                cur.close()
+                self.close()
+            except(Exception, psycopg2.DatabaseError) as error:
+                print(error)
+                self.conn.rollback()
+
+    def add_to_db(self):
+        try:
+            item = self.view.cellWidget
+            cur = self.conn.cursor()
+            cur.execute("INSERT INTO strefy VALUES('" + item(self.last_row, 0).currentText() + "');")
+            self.conn.commit()
+            cur.close()
+            self.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+            self.conn.rollback()
