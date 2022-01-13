@@ -42,3 +42,11 @@ INSERT INTO linie VALUES(168, 'autobusowa');
 
 --MODELE
 INSERT INTO modele_pojazdow VALUES(999, 'Tramino', 'tramwaj', 'tak', 78, 276, 1);
+
+-- PRZYSTANKI
+INSERT INTO przystanki VALUES(NEXTVAL('przystanek_seq'), 'Szymanowskiego', 'Szymanowskiego/Szeligowskiego', 'Poznań', 'nie', 15, 'A');
+INSERT INTO przystanki VALUES(NEXTVAL('przystanek_seq'), 'Kurpińskiego', 'Kurpińskiego/Mieszka I', 'Poznań', 'nie', 17, 'A');
+INSERT INTO przystanki VALUES(NEXTVAL('przystanek_seq'), 'Poznań Plaza', 'Lechicka/Mieszka I', 'Poznań', 'nie', 18, 'A');
+INSERT INTO przystanki VALUES(NEXTVAL('przystanek_seq'), 'Aleje Solidarności', 'Aleje Solidarności', 'Poznań', 'nie', 19, 'A');
+INSERT INTO przystanki VALUES(NEXTVAL('przystanek_seq'), 'Słowiańska', 'Słowiańska/mieszka I', 'Poznań', 'nie', 20, 'A');
+INSERT INTO przystanki VALUES(NEXTVAL('przystanek_seq'), 'Most Teatralny', 'Roosevelta/Dąbrowskiego', 'Poznań', 'nie', 21, 'A');

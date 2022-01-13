@@ -3,14 +3,6 @@
   <database-model serializer="dbm" dbms="POSTGRES" family-id="POSTGRES" format-version="4.23">
     <root id="1">
       <ServerVersion>13.5</ServerVersion>
-      <Grants>1||-9223372036854775808|c|G
-1||10|c|G
-1||10|C|G
-1||10|T|G
-13441||-9223372036854775808|c|G
-13441||10|c|G
-13441||10|C|G
-13441||10|T|G</Grants>
       <DateStyle>dmy</DateStyle>
       <TimeZones>true ACDT
 true ACSST
@@ -793,7 +785,7 @@ false YEKT
 false Z
 false Zulu
 </TimeZones>
-      <IntrospectionStateNumber>993</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1022</IntrospectionStateNumber>
       <StartupTime>1642065286</StartupTime>
     </root>
     <database id="2" parent="1" name="KomunikacjaMiejska">
@@ -806,7 +798,7 @@ false Zulu
 13158||-9223372036854775808|U|G
 13158||10|U|G</Grants>
       <Owner>postgres</Owner>
-      <IntrospectionStateNumber>994</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1023</IntrospectionStateNumber>
       <Current>1</Current>
     </database>
     <database id="3" parent="1" name="postgres">
@@ -2407,7 +2399,7 @@ false Zulu
       <ObjectId>40960</ObjectId>
       <StateNumber>651</StateNumber>
       <Owner>postgres</Owner>
-      <IntrospectionStateNumber>994</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1023</IntrospectionStateNumber>
       <Current>1</Current>
     </schema>
     <extension id="18" parent="2" name="plpgsql">
@@ -64450,7 +64442,7 @@ ABC</Labels>
     <table id="5156" parent="17" name="kasy_biletowe">
       <ObjectId>65609</ObjectId>
       <Owner>postgres</Owner>
-      <StateNumber>859</StateNumber>
+      <StateNumber>1020</StateNumber>
       <AccessMethodId>2</AccessMethodId>
     </table>
     <table id="5157" parent="17" name="kierowcy">
@@ -112656,17 +112648,17 @@ umserver</ColNames>
     </column>
     <column id="16146" parent="5156" name="godzina_otwarcia">
       <Position>2</Position>
-      <DataType>date|0s</DataType>
+      <DataType>time|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>859</StateNumber>
-      <TypeId>1082</TypeId>
+      <StateNumber>1020</StateNumber>
+      <TypeId>1083</TypeId>
     </column>
     <column id="16147" parent="5156" name="godzina_zamkniecia">
       <Position>3</Position>
-      <DataType>date|0s</DataType>
+      <DataType>time|0s</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>859</StateNumber>
-      <TypeId>1082</TypeId>
+      <StateNumber>1020</StateNumber>
+      <TypeId>1083</TypeId>
     </column>
     <column id="16148" parent="5156" name="przystanki_id_przystanku">
       <Position>4</Position>
@@ -112689,7 +112681,7 @@ umserver</ColNames>
     </column>
     <index id="16151" parent="5156" name="kasa_biletowa_pk">
       <ObjectId>65612</ObjectId>
-      <StateNumber>859</StateNumber>
+      <StateNumber>1020</StateNumber>
       <ColNames>id_kasy</ColNames>
       <Unique>1</Unique>
       <Primary>1</Primary>

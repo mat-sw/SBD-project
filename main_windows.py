@@ -187,7 +187,7 @@ class MainWindow(QWidget):
         self.window.show()
 
     def goToZonesWindow(self):
-        self.window = Zone(self.conn)
+        self.window = Strefy(self.conn)
         self.window.show()
 
     def goToArrivalWindow(self):
