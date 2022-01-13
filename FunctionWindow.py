@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QGridLayout, QPushButton, QWidget, QTableWidget
+from PyQt5.QtWidgets import QGridLayout, QPushButton, QWidget, QTableWidget, QLabel
 from PyQt5.QtCore import Qt
 
 
@@ -17,12 +17,13 @@ class FunctionWindow(QWidget):
     def initialze_grid(self):
         self.main_grid = QGridLayout()
         self.view = QTableWidget()
+        self.info_label = QLabel()
+        self.info_label.setStyleSheet("background-color: rgb(145, 252, 255); color: rgb(255, 0, 0); font-size : 14pt;")
+        self.info_label.setVisible(False)
         self.add_buttons()
         self.main_grid.addWidget(self.view, 0, 0)
+        self.main_grid.addWidget(self.info_label, 1, 0)
         self.setLayout(self.main_grid)
-
-    def choose(self):
-        pass
 
     def get_signal(self):
         self.view.clicked.connect(self.modify)

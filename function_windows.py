@@ -45,10 +45,6 @@ def select_from_db(what, table, conn):
     return data
 
 
-def remove_duplicates(x):
-    return list(dict.fromkeys(x))
-
-
 class Przyjazdy(FunctionWindow):
     def __init__(self, conn):
         super(Przyjazdy, self).__init__()
@@ -122,6 +118,8 @@ class Bilety(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
@@ -135,6 +133,8 @@ class Bilety(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
 
     def add_to_db(self):
@@ -150,6 +150,8 @@ class Bilety(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
+            self.info_label.setText(str(error))
+            self.info_label.setVisible(True)
             self.conn.rollback()
 
 
@@ -201,6 +203,8 @@ class Miasta(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
@@ -214,6 +218,8 @@ class Miasta(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
 
     def add_to_db(self):
@@ -230,6 +236,8 @@ class Miasta(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
+            self.info_label.setText(str(error))
+            self.info_label.setVisible(True)
             self.conn.rollback()
 
 
@@ -336,6 +344,8 @@ class Pojazdy(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
@@ -354,6 +364,8 @@ class Pojazdy(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
 
     def add_to_db(self):
@@ -373,6 +385,8 @@ class Pojazdy(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
+            self.info_label.setText(str(error))
+            self.info_label.setVisible(True)
             self.conn.rollback()
 
 
@@ -463,6 +477,8 @@ class Kierowcy(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
@@ -478,6 +494,8 @@ class Kierowcy(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
 
     def add_to_db(self):
@@ -494,6 +512,8 @@ class Kierowcy(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
+            self.info_label.setText(str(error))
+            self.info_label.setVisible(True)
             self.conn.rollback()
 
 
@@ -575,6 +595,8 @@ class Modele(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
@@ -589,6 +611,8 @@ class Modele(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
 
     def add_to_db(self):
@@ -605,6 +629,8 @@ class Modele(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
+            self.info_label.setText(str(error))
+            self.info_label.setVisible(True)
             self.conn.rollback()
 
 
@@ -642,6 +668,8 @@ class Producenci(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
@@ -654,6 +682,8 @@ class Producenci(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
 
     def add_to_db(self):
@@ -669,6 +699,8 @@ class Producenci(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
+            self.info_label.setText(str(error))
+            self.info_label.setVisible(True)
             self.conn.rollback()
 
 
@@ -726,6 +758,8 @@ class Linie(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
@@ -738,6 +772,8 @@ class Linie(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
 
     def add_to_db(self):
@@ -751,6 +787,8 @@ class Linie(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
+            self.info_label.setText(str(error))
+            self.info_label.setVisible(True)
             self.conn.rollback()
 
 
@@ -812,6 +850,8 @@ class Biletomaty(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
@@ -825,6 +865,8 @@ class Biletomaty(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
 
     def add_to_db(self):
@@ -840,6 +882,8 @@ class Biletomaty(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
+            self.info_label.setText(str(error))
+            self.info_label.setVisible(True)
             self.conn.rollback()
 
 
@@ -884,6 +928,8 @@ class Zone(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
@@ -896,6 +942,8 @@ class Zone(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
 
     def add_to_db(self):
@@ -908,6 +956,8 @@ class Zone(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
+            self.info_label.setText(str(error))
+            self.info_label.setVisible(True)
             self.conn.rollback()
 
 
@@ -971,11 +1021,18 @@ class KierowcyPojazdy(FunctionWindow):
     def modify(self, item):
         if item.data() == "Usuń":
             try:
-                delete_from_db("strefy", "typ_strefy", self.data[item.row()][0], self.conn)
+                command = "DELETE FROM kierowcy_i_pojazdy WHERE pojazdy_id_pojazdu = " + str(self.data[item.row()][0]) + "  AND kierowcy_pesel = '" + self.data[item.row()][4] + "';"
+                cur = self.conn.cursor()
+                print(command)
+                cur.execute(command)
+                self.conn.commit()
+                cur.close()
                 self.close()
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
@@ -993,6 +1050,8 @@ class KierowcyPojazdy(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
                 self.conn.rollback()
 
     def add_to_db(self):
@@ -1009,4 +1068,6 @@ class KierowcyPojazdy(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
+            self.info_label.setText(str(error))
+            self.info_label.setVisible(True)
             self.conn.rollback()
