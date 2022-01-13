@@ -123,9 +123,11 @@ class Bilety(FunctionWindow):
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
+                command = "UPDATE bilety SET id_biletu = " + self.view.item(item.row(), 0).text() + ", czy_ulgowy = '" + self.view.cellWidget(item.row(), 1).currentText() + "', cena = " + self.view.item(item.row(), 2).text() + ", "\
+                "czas_przejazdu = '" + self.view.cellWidget(item.row(), 3).currentText() + "', strefa_typ_strefy = '" + self.view.cellWidget(item.row(), 4).currentText() + "' WHERE id_biletu = " + str(self.data[item.row()][0]) + ";"
                 cur = self.conn.cursor()
-                cur.execute("UPDATE bilety SET id_biletu = " + self.view.item(item.row(), 0).text() + ", czy_ulgowy = '" + self.view.cellWidget(item.row(), 1).currentText() + "', cena = " + self.view.item(item.row(), 2).text() + ", "
-                             "czas_przejazdu = '" + self.view.cellWidget(item.row(), 3).currentText() + "', strefa_typ_strefy = '" + self.view.cellWidget(item.row(), 4).currentText() + "' WHERE id_biletu = " + str(self.data[item.row()][0]) + ";")
+                print(command)
+                cur.execute(command)
                 self.conn.commit()
                 cur.close()
                 self.close()
@@ -137,8 +139,10 @@ class Bilety(FunctionWindow):
         try:
             item = self.view.cellWidget
             row = self.last_row
+            command = "INSERT INTO bilety VALUES(NEXTVAL('bilet_seq'), '" + item(row, 1).currentText() + "', 0, '" + item(row, 3).currentText() + "', '" + item(row, 4).currentText() + "');"
             cur = self.conn.cursor()
-            cur.execute("INSERT INTO bilety VALUES(NEXTVAL('bilet_seq'), '" + item(row, 1).currentText() + "', 0, '" + item(row, 3).currentText() + "', '" + item(row, 4).currentText() + "');")
+            print(command)
+            cur.execute(command)
             self.conn.commit()
             cur.close()
             self.close()
@@ -198,9 +202,11 @@ class Miasta(FunctionWindow):
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
+                command = "UPDATE miasta SET nazwa_miasta = '" + self.view.item(item.row(), 0).text() + "', status = '" + self.view.cellWidget(item.row(), 1).currentText() + "', liczba_mieszkancow = " + self.view.item(item.row(), 2).text() + ", "\
+                "powierzchnia = " + self.view.item(item.row(), 3).text() + ", gestosc_zaludnienia = " + self.view.item(item.row(), 4).text() + " WHERE nazwa_miasta = '" + self.data[item.row()][0] + "';"
                 cur = self.conn.cursor()
-                cur.execute("UPDATE miasta SET nazwa_miasta = '" + self.view.item(item.row(), 0).text() + "', status = '" + self.view.cellWidget(item.row(), 1).currentText() + "', liczba_mieszkancow = " + self.view.item(item.row(), 2).text() + ", "
-                             "powierzchnia = " + self.view.item(item.row(), 3).text() + ", gestosc_zaludnienia = " + self.view.item(item.row(), 4).text() + " WHERE nazwa_miasta = '" + self.data[item.row()][0] + "';")
+                print(command)
+                cur.execute(command)
                 self.conn.commit()
                 cur.close()
                 self.close()
@@ -212,9 +218,11 @@ class Miasta(FunctionWindow):
         try:
             item = self.view.cellWidget
             row = self.last_row
+            command = "INSERT INTO miasta (nazwa_miasta, status, liczba_mieszkancow, powierzchnia) "\
+            "VALUES('" + item(row, 0).text() + "', '" + item(row, 1).currentText() + "', " + item(row, 2).text() + ", " + item(row, 3).text() + ");"
             cur = self.conn.cursor()
-            cur.execute("INSERT INTO miasta (nazwa_miasta, status, liczba_mieszkancow, powierzchnia) "
-                        "VALUES('" + item(row, 0).text() + "', '" + item(row, 1).currentText() + "', " + item(row, 2).text() + ", " + item(row, 3).text() + ");")
+            print(command)
+            cur.execute(command)
             self.conn.commit()
             cur.close()
             self.close()
@@ -316,13 +324,15 @@ class Pojazdy(FunctionWindow):
         elif item.data() == "Modyfikuj":
             try:
                 bil = self.view.cellWidget(item.row(), 3).currentText()
-                if bil == "None":
+                if bil in ["None", "-"]:
                     bil = "null"
+                command = "UPDATE pojazdy SET id_pojazdu = " + self.view.item(item.row(), 0).text() + ", max_liczba_osob = (SELECT sum_sits("+ self.view.cellWidget(item.row(), 6).currentText() + ")), "\
+                "linie_id_linii = " + self.view.cellWidget(item.row(), 2).currentText() + ", biletomaty_id_biletomatu = " + bil + ", rok_produkcji = " + self.view.item(item.row(), 4).text() +\
+                ", data_waznosci_przegladu = to_date('" + self.view.item(item.row(), 5).text() + "', 'YYYY-MM-DD'), modele_poj_id_modelu = " + self.view.cellWidget(item.row(), 6).currentText() +\
+                ", modele_poj_prod_id_producenta = " + self.view.item(item.row(), 7).text() + " WHERE id_pojazdu = " + str(self.data[item.row()][0]) + ";"
                 cur = self.conn.cursor()
-                cur.execute("UPDATE pojazdy SET id_pojazdu = " + self.view.item(item.row(), 0).text() + ", max_liczba_osob = (SELECT sum_sits("+ self.view.cellWidget(item.row(), 6).currentText() + ")), "
-                            "linie_id_linii = " + self.view.cellWidget(item.row(), 2).currentText() + ", biletomaty_id_biletomatu = " + bil + ", rok_produkcji = " + self.view.item(item.row(), 4).text() +
-                            ", data_waznosci_przegladu = to_date('" + self.view.item(item.row(), 5).text() + "', 'YYYY-MM-DD'), modele_poj_id_modelu = " + self.view.cellWidget(item.row(), 6).currentText() +
-                            ", modele_poj_prod_id_producenta = " + self.view.item(item.row(), 7).text() + " WHERE id_pojazdu = " + str(self.data[item.row()][0]) + ";")
+                print(command)
+                cur.execute(command)
                 self.conn.commit()
                 cur.close()
                 self.close()
@@ -338,8 +348,10 @@ class Pojazdy(FunctionWindow):
             bil = item(row, 3).currentText()
             if bil == "":
                 bil = "null"
-            cur.execute("INSERT INTO pojazdy VALUES(NEXTVAL('pojazd_seq'), (SELECT sum_sits("+ item(row, 6).currentText() + ")), "+ item(row, 2).currentText() +", "+ bil +", "+ item(row, 4).text() +
-                        ", to_date('"+ item(row, 5).text() +"', 'YYYY-MM-DD'), "+ item(row, 6).currentText() +", (SELECT producenci_id_producenta FROM modele_pojazdow WHERE id_modelu = "+ item(row, 6).currentText() +"));" )
+            command = "INSERT INTO pojazdy VALUES(NEXTVAL('pojazd_seq'), (SELECT sum_sits("+ item(row, 6).currentText() + ")), "+ item(row, 2).currentText() +", "+ bil +", "+ item(row, 4).text() +\
+            ", to_date('"+ item(row, 5).text() +"', 'YYYY-MM-DD'), "+ item(row, 6).currentText() +", (SELECT producenci_id_producenta FROM modele_pojazdow WHERE id_modelu = "+ item(row, 6).currentText() +"));"
+            print(command)
+            cur.execute(command)
             self.conn.commit()
             cur.close()
             self.close()
@@ -424,11 +436,13 @@ class Kierowcy(FunctionWindow):
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
+                command = "UPDATE kierowcy SET pesel = '" + self.view.item(item.row(), 0).text() + "', imie = '" + self.view.item(item.row(), 1).text() + "', nazwisko = '" + self.view.item(item.row(), 2).text() + "', "\
+                "plec = '" + self.view.cellWidget(item.row(), 3).currentText() + "', uprawnienia_autobusowe = '" + self.view.cellWidget(item.row(), 4).currentText() + "'"\
+                ", uprawnienia_tramwajowe = '" + self.view.cellWidget(item.row(), 5).currentText() + "', placa = " + self.view.item(item.row(), 6).text() +\
+                ", data_zatrudnienia = to_date('" + self.view.item(item.row(), 7).text() + "', 'YYYY-MM-DD'), stan_cywilny = '" + self.view.cellWidget(item.row(), 8).currentText() + "' WHERE pesel = '" + self.data[item.row()][0] + "';"
                 cur = self.conn.cursor()
-                cur.execute("UPDATE kierowcy SET pesel = '" + self.view.item(item.row(), 0).text() + "', imie = '" + self.view.item(item.row(), 1).text() + "', nazwisko = '" + self.view.item(item.row(), 2).text() + "', "
-                            "plec = '" + self.view.cellWidget(item.row(), 3).currentText() + "', uprawnienia_autobusowe = '" + self.view.cellWidget(item.row(), 4).currentText() + "'"
-                            ", uprawnienia_tramwajowe = '" + self.view.cellWidget(item.row(), 5).currentText() + "', placa = " + self.view.item(item.row(), 6).text() +
-                            ", data_zatrudnienia = to_date('" + self.view.item(item.row(), 7).text() + "', 'YYYY-MM-DD'), stan_cywilny = '" + self.view.cellWidget(item.row(), 8).currentText() + "' WHERE pesel = '" + self.data[item.row()][0] + "';")
+                print(command)
+                cur.execute(command)
                 self.conn.commit()
                 cur.close()
                 self.close()
@@ -440,9 +454,11 @@ class Kierowcy(FunctionWindow):
         try:
             item = self.view.cellWidget
             row = self.last_row
+            command = "INSERT INTO kierowcy VALUES('"+ item(row, 0).text() +"', '"+ item(row, 1).text() +"', '"+ item(row, 2).text() +"', '"+ item(row, 3).currentText() +"' ,'"+ item(row, 4).currentText() +\
+            "', '"+ item(row, 5).currentText() +"', "+ item(row, 6).text() +", to_date('"+ item(row, 7).text() +"', 'YYYY-MM-DD'), '"+ item(row, 8).currentText() +"');"
             cur = self.conn.cursor()
-            cur.execute("INSERT INTO kierowcy VALUES('"+ item(row, 0).text() +"', '"+ item(row, 1).text() +"', '"+ item(row, 2).text() +"', '"+ item(row, 3).currentText() +"' ,'"+ item(row, 4).currentText() +
-                        "', '"+ item(row, 5).currentText() +"', "+ item(row, 6).text() +", to_date('"+ item(row, 7).text() +"', 'YYYY-MM-DD'), '"+ item(row, 8).currentText() +"');" )
+            print(command)
+            cur.execute(command)
             self.conn.commit()
             cur.close()
             self.close()
@@ -532,10 +548,12 @@ class Modele(FunctionWindow):
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
+                command = "UPDATE modele_pojazdow SET id_modelu = " + self.view.item(item.row(), 0).text() + ", nazwa_modelu = '" + self.view.item(item.row(), 1).text() + "', typ_pojazdu = '" + self.view.cellWidget(item.row(), 2).currentText() + "', "\
+                "czy_niskopodlogowy = '" + self.view.cellWidget(item.row(), 3).currentText() + "', liczba_miejsc_siedzacych = " + self.view.item(item.row(), 4).text() + ", "\
+                "liczba_miejsc_stojacych = " + self.view.item(item.row(), 5).text() + ", producenci_id_producenta = " + self.view.cellWidget(item.row(), 6).currentText() + " WHERE id_modelu = '" + str(self.data[item.row()][0]) + "';"
                 cur = self.conn.cursor()
-                cur.execute("UPDATE modele_pojazdow SET id_modelu = " + self.view.item(item.row(), 0).text() + ", nazwa_modelu = '" + self.view.item(item.row(), 1).text() + "', typ_pojazdu = '" + self.view.cellWidget(item.row(), 2).currentText() + "', "
-                            "czy_niskopodlogowy = '" + self.view.cellWidget(item.row(), 3).currentText() + "', liczba_miejsc_siedzacych = " + self.view.item(item.row(), 4).text() + ", "
-                            "liczba_miejsc_stojacych = " + self.view.item(item.row(), 5).text() + ", producenci_id_producenta = " + self.view.cellWidget(item.row(), 6).currentText() + " WHERE id_modelu = '" + str(self.data[item.row()][0]) + "';")
+                print(command)
+                cur.execute(command)
                 self.conn.commit()
                 cur.close()
                 self.close()
@@ -547,9 +565,11 @@ class Modele(FunctionWindow):
         try:
             item = self.view.cellWidget
             row = self.last_row
+            command = "INSERT INTO modele_pojazdow VALUES(NEXTVAL('model_seq'), '" + item(row, 1).text() + "', '" + item(row, 2).currentText() + "', '" +\
+            item(row, 3).currentText() + "', " + item(row, 4).text() + ", " + item(row, 5).text() + ", " + item(row, 6).currentText() + ");"
             cur = self.conn.cursor()
-            cur.execute("INSERT INTO modele_pojazdow VALUES(NEXTVAL('model_seq'), '" + item(row, 1).text() + "', '" + item(row, 2).currentText() + "', '" +
-                        item(row, 3).currentText() + "', " + item(row, 4).text() + ", " + item(row, 5).text() + ", " + item(row, 6).currentText() + ");")
+            print(command)
+            cur.execute(command)
             self.conn.commit()
             cur.close()
             self.close()
@@ -595,8 +615,10 @@ class Producenci(FunctionWindow):
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
+                command = "UPDATE producenci SET id_producenta = " + self.view.item(item.row(), 0).text() + ", nazwa_producenta = '" + self.view.item(item.row(), 1).text() + "' WHERE id_producenta = " + str(self.data[item.row()][0]) + ";"
                 cur = self.conn.cursor()
-                cur.execute("UPDATE producenci SET id_producenta = " + self.view.item(item.row(), 0).text() + ", nazwa_producenta = '" + self.view.item(item.row(), 1).text() + "' WHERE id_producenta = " + str(self.data[item.row()][0]) + ";")
+                print(command)
+                cur.execute(command)
                 self.conn.commit()
                 cur.close()
                 self.close()
@@ -608,8 +630,10 @@ class Producenci(FunctionWindow):
         try:
             item = self.view.cellWidget
             row = self.last_row
+            command = "INSERT INTO producenci VALUES(NEXTVAL('producer_seq'), '" + item(row, 1).text() + "');"
             cur = self.conn.cursor()
-            cur.execute("INSERT INTO producenci VALUES(NEXTVAL('producer_seq'), '" + item(row, 1).text() + "');")
+            print(command)
+            cur.execute(command)
             self.conn.commit()
             cur.close()
             self.close()
@@ -675,8 +699,10 @@ class Linie(FunctionWindow):
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
+                command = "UPDATE linie SET id_linii = " + self.view.item(item.row(), 0).text() + ", typ_linii = '" + self.view.cellWidget(item.row(), 1).currentText() + "' WHERE id_linii = " + str(self.data[item.row()][0]) + ";"
                 cur = self.conn.cursor()
-                cur.execute("UPDATE linie SET id_linii = " + self.view.item(item.row(), 0).text() + ", typ_linii = '" + self.view.cellWidget(item.row(), 1).currentText() + "' WHERE id_linii = " + str(self.data[item.row()][0]) + ";")
+                print(command)
+                cur.execute(command)
                 self.conn.commit()
                 cur.close()
                 self.close()
@@ -759,9 +785,11 @@ class Biletomaty(FunctionWindow):
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
+                command = "UPDATE biletomaty SET id_biletomatu = " + self.view.item(item.row(), 0).text() + ", platnosc_gotowka = '" + self.view.cellWidget(item.row(), 1).currentText() + "'" \
+                          ", platnosc_karta = '" + self.view.cellWidget(item.row(), 2).currentText() + "' WHERE id_biletomatu = " + str(self.data[item.row()][0]) + ";"
                 cur = self.conn.cursor()
-                cur.execute("UPDATE biletomaty SET id_biletomatu = " + self.view.item(item.row(), 0).text() + ", platnosc_gotowka = '" + self.view.cellWidget(item.row(), 1).currentText() + "'"
-                            ", platnosc_karta = '" + self.view.cellWidget(item.row(), 2).currentText() + "' WHERE id_biletomatu = " + str(self.data[item.row()][0]) + ";")
+                print(command)
+                cur.execute(command)
                 self.conn.commit()
                 cur.close()
                 self.close()
@@ -773,8 +801,10 @@ class Biletomaty(FunctionWindow):
         try:
             item = self.view.cellWidget
             row = self.last_row
+            command = "INSERT INTO biletomaty VALUES(NEXTVAL('biletomat_seq'), '" + item(row, 1).currentText() + "', '" + item(row, 2).currentText() + "');"
             cur = self.conn.cursor()
-            cur.execute("INSERT INTO biletomaty VALUES(NEXTVAL('biletomat_seq'), '" + item(row, 1).currentText() + "', '" + item(row, 2).currentText() + "');")
+            print(command)
+            cur.execute(command)
             self.conn.commit()
             cur.close()
             self.close()
@@ -827,8 +857,10 @@ class Zone(FunctionWindow):
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
+                command = "UPDATE strefy SET typ_strefy = '" + self.view.cellWidget(item.row(), 0).currentText() + "' WHERE typ_strefy = '" + self.data[item.row()][0] + "';"
                 cur = self.conn.cursor()
-                cur.execute("UPDATE strefy SET typ_strefy = '" + self.view.item(item.row(), 0).text() + "' WHERE typ_strefy = '" + self.data[item.row()][0] + "';")
+                print(command)
+                cur.execute(command)
                 self.conn.commit()
                 cur.close()
                 self.close()
@@ -917,13 +949,15 @@ class KierowcyPojazdy(FunctionWindow):
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
-                cur = self.conn.cursor()
                 id_pojazdu = self.view.cellWidget(item.row(), 0).currentText()
-                cur.execute("UPDATE kierowcy_i_pojazdy SET pojazdy_id_pojazdu = " + id_pojazdu + ", pojazdy_linie_id_linii = (SELECT linie_id_linii FROM pojazdy WHERE id_pojazdu = " + id_pojazdu +
-                            "), pojazdy_id_modelu = (SELECT modele_poj_id_modelu FROM pojazdy WHERE id_pojazdu = " + id_pojazdu + "), "
-                            "pojazdy_id_producenta = (SELECT modele_poj_prod_id_producenta FROM pojazdy WHERE id_pojazdu = " + id_pojazdu + "), "
-                            "kierowcy_pesel = '" + self.view.cellWidget(item.row(), 4).currentText() + "' WHERE pojazdy_id_pojazdu = " + str(self.data[item.row()][0]) +
-                            " AND kierowcy_pesel = '" + self.data[item.row()][4] + "';")
+                command = "UPDATE kierowcy_i_pojazdy SET pojazdy_id_pojazdu = " + id_pojazdu + ", pojazdy_linie_id_linii = (SELECT linie_id_linii FROM pojazdy WHERE id_pojazdu = " + id_pojazdu +\
+                            "), pojazdy_id_modelu = (SELECT modele_poj_id_modelu FROM pojazdy WHERE id_pojazdu = " + id_pojazdu + "), "\
+                            "pojazdy_id_producenta = (SELECT modele_poj_prod_id_producenta FROM pojazdy WHERE id_pojazdu = " + id_pojazdu + "), "\
+                            "kierowcy_pesel = '" + self.view.cellWidget(item.row(), 4).currentText() + "' WHERE pojazdy_id_pojazdu = " + str(self.data[item.row()][0]) +\
+                            " AND kierowcy_pesel = '" + self.data[item.row()][4] + "';"
+                cur = self.conn.cursor()
+                print(command)
+                cur.execute(command)
                 self.conn.commit()
                 cur.close()
                 self.close()
@@ -934,10 +968,12 @@ class KierowcyPojazdy(FunctionWindow):
     def add_to_db(self):
         try:
             item = self.view.cellWidget
+            command = "INSERT INTO kierowcy_i_pojazdy VALUES(" + item(self.last_row, 0).currentText() + ", (SELECT linie_id_linii FROM pojazdy WHERE id_pojazdu = " + item(self.last_row, 0).currentText() + "), "\
+            "(SELECT modele_poj_id_modelu FROM pojazdy WHERE id_pojazdu = " + item(self.last_row, 0).currentText() + "), "\
+            "(SELECT modele_poj_prod_id_producenta FROM pojazdy WHERE id_pojazdu = " + item(self.last_row, 0).currentText() + "), "+ item(self.last_row, 4).currentText() + ");"
             cur = self.conn.cursor()
-            cur.execute("INSERT INTO kierowcy_i_pojazdy VALUES(" + item(self.last_row, 0).currentText() + ", (SELECT linie_id_linii FROM pojazdy WHERE id_pojazdu = " + item(self.last_row, 0).currentText() + "), "
-                        "(SELECT modele_poj_id_modelu FROM pojazdy WHERE id_pojazdu = " + item(self.last_row, 0).currentText() + "), "
-                        "(SELECT modele_poj_prod_id_producenta FROM pojazdy WHERE id_pojazdu = " + item(self.last_row, 0).currentText() + "), "+ item(self.last_row, 4).currentText() + ");")
+            print(command)
+            cur.execute(command)
             self.conn.commit()
             cur.close()
             self.close()
