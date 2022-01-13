@@ -61,7 +61,7 @@ CREATE TRIGGER ObliczGestosc
 	EXECUTE PROCEDURE GestoscZaludnienia();
 	
 -- FUNCTIONS
--- zwraca sumę miejsc stojących i siedzących
+-- RETURNS total capacity of the vehicle
 CREATE OR REPLACE FUNCTION sum_sits(id_mod integer)
     RETURNS integer
     LANGUAGE PLPGSQL
