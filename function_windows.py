@@ -43,6 +43,10 @@ def select_from_db(what, table, conn):
     return data
 
 
+def remove_duplicates(x):
+    return list(dict.fromkeys(x))
+
+
 class Przyjazdy(FunctionWindow):
     def __init__(self, conn):
         super(Przyjazdy, self).__init__()
@@ -64,6 +68,30 @@ class Bilety(FunctionWindow):
             rows = self.view.rowCount()
             self.view.setRowCount(rows + 1)
             for i, _ in enumerate([str(item[0]), item[1], str(item[2]), item[3], item[4], "Modyfikuj", "Usuń"]):
+                if i == 1:
+                    lista_tak_nie = QComboBox(self)
+                    lista_tak_nie.addItem(item[i])
+                    for id in ['tak', 'nie']:
+                        if id != item[i]:
+                            lista_tak_nie.addItem(id)
+                    self.view.setCellWidget(rows, i, lista_tak_nie)
+                    continue
+                if i == 3:
+                    lista_czas = QComboBox(self)
+                    lista_czas.addItem(item[i])
+                    for id in ['15', '30', '60']:
+                        if id != item[i]:
+                            lista_czas.addItem(id)
+                    self.view.setCellWidget(rows, i, lista_czas)
+                    continue
+                if i == 4:
+                    lista_stref = QComboBox(self)
+                    lista_stref.addItem(item[i])
+                    for id in ['A', 'B', 'C', 'AB', 'ABC']:
+                        if id != item[i]:
+                            lista_stref.addItem(id)
+                    self.view.setCellWidget(rows, i, lista_stref)
+                    continue
                 self.view.setItem(rows, i, QTableWidgetItem(_))
 
         self.last_row = self.view.rowCount()
@@ -96,8 +124,8 @@ class Bilety(FunctionWindow):
         elif item.data() == "Modyfikuj":
             try:
                 cur = self.conn.cursor()
-                cur.execute("UPDATE bilety SET id_biletu = " + self.view.item(item.row(), 0).text() + ", czy_ulgowy = '" + self.view.item(item.row(), 1).text() + "', cena = " + self.view.item(item.row(), 2).text() + ", "
-                             "czas_przejazdu = '" + self.view.item(item.row(), 3).text() + "', strefa_typ_strefy = '" + self.view.item(item.row(), 4).text() + "' WHERE id_biletu = " + str(self.data[item.row()][0]) + ";")
+                cur.execute("UPDATE bilety SET id_biletu = " + self.view.item(item.row(), 0).text() + ", czy_ulgowy = '" + self.view.cellWidget(item.row(), 1).currentText() + "', cena = " + self.view.item(item.row(), 2).text() + ", "
+                             "czas_przejazdu = '" + self.view.cellWidget(item.row(), 3).currentText() + "', strefa_typ_strefy = '" + self.view.cellWidget(item.row(), 4).currentText() + "' WHERE id_biletu = " + str(self.data[item.row()][0]) + ";")
                 self.conn.commit()
                 cur.close()
                 self.close()
@@ -133,11 +161,24 @@ class Miasta(FunctionWindow):
             rows = self.view.rowCount()
             self.view.setRowCount(rows + 1)
             for i, _ in enumerate([item[0], item[1], str(item[2]), str(item[3]), str(round(item[4], 2)), "Modyfikuj", "Usuń"]):
+                if i == 1:
+                    lista_status = QComboBox(self)
+                    lista_status.addItem(item[i])
+                    for id in ["miasto", "wies"]:
+                        if id != item[i]:
+                            lista_status.addItem(id)
+                    self.view.setCellWidget(rows, i, lista_status)
+                    continue
                 self.view.setItem(rows, i, QTableWidgetItem(_))
 
         self.last_row = self.view.rowCount()
         self.view.setRowCount(self.last_row + 1)
         for i in range(len(self.labels)-1):
+            if i == 1:
+                lista_status = QComboBox(self)
+                lista_status.addItems(["", "miasto", "wies"])
+                self.view.setCellWidget(self.last_row, i, lista_status)
+                continue
             self.view.setCellWidget(self.last_row, i, QLineEdit())
         self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
 
@@ -158,7 +199,7 @@ class Miasta(FunctionWindow):
         elif item.data() == "Modyfikuj":
             try:
                 cur = self.conn.cursor()
-                cur.execute("UPDATE miasta SET nazwa_miasta = '" + self.view.item(item.row(), 0).text() + "', status = '" + self.view.item(item.row(), 1).text() + "', liczba_mieszkancow = " + self.view.item(item.row(), 2).text() + ", "
+                cur.execute("UPDATE miasta SET nazwa_miasta = '" + self.view.item(item.row(), 0).text() + "', status = '" + self.view.cellWidget(item.row(), 1).currentText() + "', liczba_mieszkancow = " + self.view.item(item.row(), 2).text() + ", "
                              "powierzchnia = " + self.view.item(item.row(), 3).text() + ", gestosc_zaludnienia = " + self.view.item(item.row(), 4).text() + " WHERE nazwa_miasta = '" + self.data[item.row()][0] + "';")
                 self.conn.commit()
                 cur.close()
@@ -173,7 +214,7 @@ class Miasta(FunctionWindow):
             row = self.last_row
             cur = self.conn.cursor()
             cur.execute("INSERT INTO miasta (nazwa_miasta, status, liczba_mieszkancow, powierzchnia) "
-                        "VALUES('" + item(row, 0).text() + "', '" + item(row, 1).text() + "', " + item(row, 2).text() + ", " + item(row, 3).text() + ");")
+                        "VALUES('" + item(row, 0).text() + "', '" + item(row, 1).currentText() + "', " + item(row, 2).text() + ", " + item(row, 3).text() + ");")
             self.conn.commit()
             cur.close()
             self.close()
@@ -196,34 +237,64 @@ class Pojazdy(FunctionWindow):
             rows = self.view.rowCount()
             self.view.setRowCount(rows + 1)
             for i, _ in enumerate([str(item[0]), str(item[1]), str(item[2]), str(item[3]), str(item[4]), str(item[5]), str(item[6]), str(item[7]), "Modyfikuj", "Usuń"]):
+                if i == 2:
+                    lista_linii = QComboBox(self)
+                    lista_linii.addItem(str(item[i]))
+                    ids = select_from_db("id_linii", "linie", conn)
+                    for id in ids:
+                        if id[0] != item[i]:
+                            lista_linii.addItem(str(id[0]))
+                    self.view.setCellWidget(rows, i, lista_linii)
+                    continue
+                if i == 3:
+                    lista_bil = QComboBox(self)
+                    if str(item[i]) == "None":
+                        lista_bil.addItem('-')
+                    else:
+                        lista_bil.addItem(str(item[i]))
+                    ids = select_from_db("id_biletomatu", "biletomaty", conn)
+                    for id in ids:
+                        if id[0] != item[i]:
+                            lista_bil.addItem(str(id[0]))
+                    self.view.setCellWidget(rows, i, lista_bil)
+                    continue
+                if i == 6:
+                    lista = QComboBox(self)
+                    lista.addItem(str(item[i]))
+                    ids = select_from_db("id_modelu", "modele_pojazdow", conn)
+                    for id in ids:
+                        if id[0] != item[i]:
+                            lista.addItem(str(id[0]))
+                    self.view.setCellWidget(rows, i, lista)
+                    continue
                 self.view.setItem(rows, i, QTableWidgetItem(_))
 
         self.last_row = self.view.rowCount()
         self.view.setRowCount(self.last_row + 1)
         for i in range(2, len(self.labels)-1):
             if i == 2:
-                lista_linie = QComboBox(self)
+                lista = QComboBox(self)
                 ids = select_from_db("id_linii", "linie", conn)
-                lista_linie.addItem("")
+                lista.addItem("")
                 for item in ids:
-                    lista_linie.addItem(str(item[0]))
-                self.view.setCellWidget(self.last_row, i, lista_linie)
+                    lista.addItem(str(item[0]))
+                self.view.setCellWidget(self.last_row, i, lista)
                 continue
             if i == 3:
-                lista_biletomaty = QComboBox(self)
+                lista = QComboBox(self)
                 ids = select_from_db("id_biletomatu", "biletomaty", conn)
-                lista_biletomaty.addItem("")
+                lista.addItem("")
                 for item in ids:
-                    lista_biletomaty.addItem(str(item[0]))
-                self.view.setCellWidget(self.last_row, i, lista_biletomaty)
+                    lista.addItem(str(item[0]))
+                self.view.setCellWidget(self.last_row, i, lista)
                 continue
             if i == 6:
-                lista_modele = QComboBox(self)
+                lista = QComboBox(self)
                 ids = select_from_db("id_modelu", "modele_pojazdow", conn)
-                lista_modele.addItem("")
+                lista.addItem("")
                 for item in ids:
-                    lista_modele.addItem(str(item[0]))
-                self.view.setCellWidget(self.last_row, i, lista_modele)
+                    lista.addItem(str(item[0]))
+                self.view.setCellWidget(self.last_row, i, lista)
                 continue
             self.view.setCellWidget(self.last_row, i, QLineEdit())
         self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
@@ -244,10 +315,13 @@ class Pojazdy(FunctionWindow):
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
+                bil = self.view.cellWidget(item.row(), 3).currentText()
+                if bil == "None":
+                    bil = "null"
                 cur = self.conn.cursor()
-                cur.execute("UPDATE pojazdy SET id_pojazdu = " + self.view.item(item.row(), 0).text() + ", max_liczba_osob = (SELECT sum_sits("+ self.view.item(item.row(), 6).text() + ")), linie_id_linii = " + self.view.item(item.row(), 2).text() +
-                            ", biletomaty_id_biletomatu = " + self.view.item(item.row(), 3).text() + ", rok_produkcji = " + self.view.item(item.row(), 4).text() +
-                            ", data_waznosci_przegladu = to_date('" + self.view.item(item.row(), 5).text() + "', 'YYYY-MM-DD'), modele_poj_id_modelu = " + self.view.item(item.row(), 6).text() +
+                cur.execute("UPDATE pojazdy SET id_pojazdu = " + self.view.item(item.row(), 0).text() + ", max_liczba_osob = (SELECT sum_sits("+ self.view.cellWidget(item.row(), 6).currentText() + ")), "
+                            "linie_id_linii = " + self.view.cellWidget(item.row(), 2).currentText() + ", biletomaty_id_biletomatu = " + bil + ", rok_produkcji = " + self.view.item(item.row(), 4).text() +
+                            ", data_waznosci_przegladu = to_date('" + self.view.item(item.row(), 5).text() + "', 'YYYY-MM-DD'), modele_poj_id_modelu = " + self.view.cellWidget(item.row(), 6).currentText() +
                             ", modele_poj_prod_id_producenta = " + self.view.item(item.row(), 7).text() + " WHERE id_pojazdu = " + str(self.data[item.row()][0]) + ";")
                 self.conn.commit()
                 cur.close()
@@ -261,7 +335,10 @@ class Pojazdy(FunctionWindow):
             item = self.view.cellWidget
             row = self.last_row
             cur = self.conn.cursor()
-            cur.execute("INSERT INTO pojazdy VALUES(NEXTVAL('pojazd_seq'), (SELECT sum_sits("+ item(row, 6).currentText() + ")), "+ item(row, 2).currentText() +", "+ item(row, 3).currentText() +", "+ item(row, 4).text() +
+            bil = item(row, 3).currentText()
+            if bil == "":
+                bil = "null"
+            cur.execute("INSERT INTO pojazdy VALUES(NEXTVAL('pojazd_seq'), (SELECT sum_sits("+ item(row, 6).currentText() + ")), "+ item(row, 2).currentText() +", "+ bil +", "+ item(row, 4).text() +
                         ", to_date('"+ item(row, 5).text() +"', 'YYYY-MM-DD'), "+ item(row, 6).currentText() +", (SELECT producenci_id_producenta FROM modele_pojazdow WHERE id_modelu = "+ item(row, 6).currentText() +"));" )
             self.conn.commit()
             cur.close()
@@ -285,25 +362,49 @@ class Kierowcy(FunctionWindow):
             rows = self.view.rowCount()
             self.view.setRowCount(rows + 1)
             for i, _ in enumerate([item[0], item[1], item[2], item[3], item[4], item[5], str(item[6]), str(item[7]), item[8], "Modyfikuj", "Usuń"]):
+                if i == 3:
+                    lista = QComboBox(self)
+                    lista.addItem(item[i])
+                    for id in ["mezczyzna", "kobieta"]:
+                        if id != item[i]:
+                            lista.addItem(id)
+                    self.view.setCellWidget(rows, i, lista)
+                    continue
+                if i == 4 or i == 5:
+                    lista = QComboBox(self)
+                    lista.addItem(item[i])
+                    for id in ["tak", "nie"]:
+                        if id != item[i]:
+                            lista.addItem(id)
+                    self.view.setCellWidget(rows, i, lista)
+                    continue
+                if i == 8:
+                    lista = QComboBox(self)
+                    lista.addItem(item[i])
+                    for id in ['zonaty', 'zamezna', 'wdowiec', 'wdowa', 'panna', 'kawaler', 'rozwiedziony', 'rozwiedziona', 'w separacji']:
+                        if id != item[i]:
+                            lista.addItem(id)
+                    self.view.setCellWidget(rows, i, lista)
+                    continue
                 self.view.setItem(rows, i, QTableWidgetItem(_))
 
         self.last_row = self.view.rowCount()
         self.view.setRowCount(self.last_row + 1)
         for i in range(len(self.labels)):
             if i == 3:
-                lista_plec = QComboBox(self)
-                lista_plec.addItems(["", "mezczyzna", "kobieta"])
-                self.view.setCellWidget(self.last_row, i, lista_plec)
+                lista = QComboBox(self)
+                lista.addItems(["", "mezczyzna", "kobieta"])
+                self.view.setCellWidget(self.last_row, i, lista)
                 continue
             if i == 4 or i == 5:
-                lista_tak_nie = QComboBox(self)
-                lista_tak_nie.addItems(["", "tak", "nie"])
-                self.view.setCellWidget(self.last_row, i, lista_tak_nie)
+                lista = QComboBox(self)
+                lista.addItems(["", "tak", "nie"])
+                self.view.setCellWidget(self.last_row, i, lista)
                 continue
             if i == 8:
-                lista_stan = QComboBox(self)
-                lista_stan.addItems(['', 'zonaty', 'zamezna', 'wdowiec', 'wdowa', 'panna', 'kawaler', 'rozwiedziony', 'rozwiedziona', 'w separacji'])
-                self.view.setCellWidget(self.last_row, i, lista_stan)
+                lista = QComboBox(self)
+                lista.addItems(['', 'zonaty', 'zamezna', 'wdowiec', 'wdowa', 'panna', 'kawaler', 'rozwiedziony', 'rozwiedziona', 'w separacji'])
+                self.view.setCellWidget(self.last_row, i, lista)
                 continue
             self.view.setCellWidget(self.last_row, i, QLineEdit())
         self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
@@ -325,9 +426,9 @@ class Kierowcy(FunctionWindow):
             try:
                 cur = self.conn.cursor()
                 cur.execute("UPDATE kierowcy SET pesel = '" + self.view.item(item.row(), 0).text() + "', imie = '" + self.view.item(item.row(), 1).text() + "', nazwisko = '" + self.view.item(item.row(), 2).text() + "', "
-                            "plec = '" + self.view.item(item.row(), 3).text() + "', uprawnienia_autobusowe = '" + self.view.item(item.row(), 4).text() + "'"
-                            ", uprawnienia_tramwajowe = '" + self.view.item(item.row(), 5).text() + "', placa = " + self.view.item(item.row(), 6).text() +
-                            ", data_zatrudnienia = to_date('" + self.view.item(item.row(), 7).text() + "', 'YYYY-MM-DD'), stan_cywilny = '" + self.view.item(item.row(), 8).text() + "' WHERE pesel = '" + self.data[item.row()][0] + "';")
+                            "plec = '" + self.view.cellWidget(item.row(), 3).currentText() + "', uprawnienia_autobusowe = '" + self.view.cellWidget(item.row(), 4).currentText() + "'"
+                            ", uprawnienia_tramwajowe = '" + self.view.cellWidget(item.row(), 5).currentText() + "', placa = " + self.view.item(item.row(), 6).text() +
+                            ", data_zatrudnienia = to_date('" + self.view.item(item.row(), 7).text() + "', 'YYYY-MM-DD'), stan_cywilny = '" + self.view.cellWidget(item.row(), 8).currentText() + "' WHERE pesel = '" + self.data[item.row()][0] + "';")
                 self.conn.commit()
                 cur.close()
                 self.close()
@@ -339,7 +440,6 @@ class Kierowcy(FunctionWindow):
         try:
             item = self.view.cellWidget
             row = self.last_row
-            print("Dodaj funckjonalnosc")
             cur = self.conn.cursor()
             cur.execute("INSERT INTO kierowcy VALUES('"+ item(row, 0).text() +"', '"+ item(row, 1).text() +"', '"+ item(row, 2).text() +"', '"+ item(row, 3).currentText() +"' ,'"+ item(row, 4).currentText() +
                         "', '"+ item(row, 5).currentText() +"', "+ item(row, 6).text() +", to_date('"+ item(row, 7).text() +"', 'YYYY-MM-DD'), '"+ item(row, 8).currentText() +"');" )
@@ -365,28 +465,53 @@ class Modele(FunctionWindow):
             rows = self.view.rowCount()
             self.view.setRowCount(rows + 1)
             for i, _ in enumerate([str(item[0]), item[1], item[2], item[3], str(item[4]), str(item[5]), str(item[6]), "Modyfikuj", "Usuń"]):
+                if i == 2:
+                    lista = QComboBox(self)
+                    lista.addItem(item[i])
+                    for id in ["tramwaj", "autobus"]:
+                        if id != item[i]:
+                            lista.addItem(id)
+                    self.view.setCellWidget(rows, i, lista)
+                    continue
+                if i == 3:
+                    lista = QComboBox(self)
+                    lista.addItem(item[i])
+                    for id in ["tak", "nie"]:
+                        if id != item[i]:
+                            lista.addItem(id)
+                    self.view.setCellWidget(rows, i, lista)
+                    continue
+                if i == 6:
+                    lista = QComboBox(self)
+                    lista.addItem(str(item[i]))
+                    ids = select_from_db("id_producenta", "producenci", conn)
+                    for id in ids:
+                        if id[0] != item[i]:
+                            lista.addItem(str(id[0]))
+                    self.view.setCellWidget(rows, i, lista)
+                    continue
                 self.view.setItem(rows, i, QTableWidgetItem(_))
 
         self.last_row = self.view.rowCount()
         self.view.setRowCount(self.last_row + 1)
         for i in range(1, len(self.labels)):
             if i == 2:
-                lista_typ = QComboBox(self)
-                lista_typ.addItems(["", "tramwaj", "autobus"])
-                self.view.setCellWidget(self.last_row, i, lista_typ)
+                lista = QComboBox(self)
+                lista.addItems(["", "tramwaj", "autobus"])
+                self.view.setCellWidget(self.last_row, i, lista)
                 continue
             if i == 3:
-                lista_tak_nie = QComboBox(self)
-                lista_tak_nie.addItems(["", "tak", "nie"])
-                self.view.setCellWidget(self.last_row, i, lista_tak_nie)
+                lista = QComboBox(self)
+                lista.addItems(["", "tak", "nie"])
+                self.view.setCellWidget(self.last_row, i, lista)
                 continue
             if i == 6:
-                lista_prod = QComboBox(self)
+                lista = QComboBox(self)
                 ids = select_from_db("id_producenta", "producenci", conn)
-                lista_prod.addItem("")
+                lista.addItem("")
                 for item in ids:
-                    lista_prod.addItem(str(item[0]))
-                self.view.setCellWidget(self.last_row, i, lista_prod)
+                    lista.addItem(str(item[0]))
+                self.view.setCellWidget(self.last_row, i, lista)
                 continue
             self.view.setCellWidget(self.last_row, i, QLineEdit())
         self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
@@ -408,9 +533,9 @@ class Modele(FunctionWindow):
         elif item.data() == "Modyfikuj":
             try:
                 cur = self.conn.cursor()
-                cur.execute("UPDATE modele_pojazdow SET id_modelu = " + self.view.item(item.row(), 0).text() + ", nazwa_modelu = '" + self.view.item(item.row(), 1).text() + "', typ_pojazdu = '" + self.view.item(item.row(), 2).text() + "', "
-                            "czy_niskopodlogowy = '" + self.view.item(item.row(), 3).text() + "', liczba_miejsc_siedzacych = " + self.view.item(item.row(), 4).text() + ", "
-                            "liczba_miejsc_stojacych = " + self.view.item(item.row(), 5).text() + ", producenci_id_producenta = " + self.view.item(item.row(), 6).text() + " WHERE id_modelu = '" + str(self.data[item.row()][0]) + "';")
+                cur.execute("UPDATE modele_pojazdow SET id_modelu = " + self.view.item(item.row(), 0).text() + ", nazwa_modelu = '" + self.view.item(item.row(), 1).text() + "', typ_pojazdu = '" + self.view.cellWidget(item.row(), 2).currentText() + "', "
+                            "czy_niskopodlogowy = '" + self.view.cellWidget(item.row(), 3).currentText() + "', liczba_miejsc_siedzacych = " + self.view.item(item.row(), 4).text() + ", "
+                            "liczba_miejsc_stojacych = " + self.view.item(item.row(), 5).text() + ", producenci_id_producenta = " + self.view.cellWidget(item.row(), 6).currentText() + " WHERE id_modelu = '" + str(self.data[item.row()][0]) + "';")
                 self.conn.commit()
                 cur.close()
                 self.close()
@@ -514,15 +639,23 @@ class Linie(FunctionWindow):
             rows = self.view.rowCount()
             self.view.setRowCount(rows + 1)
             for i, _ in enumerate([str(item[0]), item[1], "Modyfikuj", "Usuń"]):
+                if i == 1:
+                    lista = QComboBox(self)
+                    lista.addItem(item[i])
+                    for id in ["autobusowa", "tramwajowa"]:
+                        if id != item[i]:
+                            lista.addItem(id)
+                    self.view.setCellWidget(rows, i, lista)
+                    continue
                 self.view.setItem(rows, i, QTableWidgetItem(_))
 
         self.last_row = self.view.rowCount()
         self.view.setRowCount(self.last_row + 1)
 
         self.view.setCellWidget(self.last_row, 0, QLineEdit())
-        lista_linia = QComboBox(self)
-        lista_linia.addItems(["", "autobusowa", "tramwajowa"])
-        self.view.setCellWidget(self.last_row, 1, lista_linia)
+        lista = QComboBox(self)
+        lista.addItems(["", "autobusowa", "tramwajowa"])
+        self.view.setCellWidget(self.last_row, 1, lista)
 
         self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
 
@@ -543,7 +676,7 @@ class Linie(FunctionWindow):
         elif item.data() == "Modyfikuj":
             try:
                 cur = self.conn.cursor()
-                cur.execute("UPDATE linie SET id_linii = " + self.view.item(item.row(), 0).text() + ", typ_linii = '" + self.view.item(item.row(), 1).text() + "' WHERE id_linii = " + str(self.data[item.row()][0]) + ";")
+                cur.execute("UPDATE linie SET id_linii = " + self.view.item(item.row(), 0).text() + ", typ_linii = '" + self.view.cellWidget(item.row(), 1).currentText() + "' WHERE id_linii = " + str(self.data[item.row()][0]) + ";")
                 self.conn.commit()
                 cur.close()
                 self.close()
@@ -593,14 +726,22 @@ class Biletomaty(FunctionWindow):
             rows = self.view.rowCount()
             self.view.setRowCount(rows + 1)
             for i, _ in enumerate([str(item[0]), item[1], item[2], "Modyfikuj", "Usuń"]):
+                if i in [1, 2]:
+                    lista = QComboBox(self)
+                    lista.addItem(item[i])
+                    for id in ['tak', 'nie']:
+                        if id != item[i]:
+                            lista.addItem(id)
+                    self.view.setCellWidget(rows, i, lista)
+                    continue
                 self.view.setItem(rows, i, QTableWidgetItem(_))
 
         self.last_row = self.view.rowCount()
         self.view.setRowCount(self.last_row + 1)
         for i in range(1, 3):
-            lista_tak_nie = QComboBox(self)
-            lista_tak_nie.addItems(['', 'tak', 'nie'])
-            self.view.setCellWidget(self.last_row, i, lista_tak_nie)
+            lista = QComboBox(self)
+            lista.addItems(['', 'tak', 'nie'])
+            self.view.setCellWidget(self.last_row, i, lista)
         self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
 
         self.view.resizeColumnsToContents()
@@ -619,8 +760,8 @@ class Biletomaty(FunctionWindow):
         elif item.data() == "Modyfikuj":
             try:
                 cur = self.conn.cursor()
-                cur.execute("UPDATE biletomaty SET id_biletomatu = " + self.view.item(item.row(), 0).text() + ", platnosc_gotowka = '" + self.view.item(item.row(), 1).text() + "'"
-                            ", platnosc_karta = '" + self.view.item(item.row(), 2).text() + "' WHERE id_biletomatu = " + str(self.data[item.row()][0]) + ";")
+                cur.execute("UPDATE biletomaty SET id_biletomatu = " + self.view.item(item.row(), 0).text() + ", platnosc_gotowka = '" + self.view.cellWidget(item.row(), 1).currentText() + "'"
+                            ", platnosc_karta = '" + self.view.cellWidget(item.row(), 2).currentText() + "' WHERE id_biletomatu = " + str(self.data[item.row()][0]) + ";")
                 self.conn.commit()
                 cur.close()
                 self.close()
@@ -655,15 +796,20 @@ class Zone(FunctionWindow):
         for item in self.data:
             rows = self.view.rowCount()
             self.view.setRowCount(rows + 1)
-            self.view.setItem(rows, 0, QTableWidgetItem(item[0]))
+            lista = QComboBox(self)
+            lista.addItem(item[0])
+            for id in ['A', 'B', 'C', 'AB', 'ABC']:
+                if id != item[0]:
+                    lista.addItem(id)
+            self.view.setCellWidget(rows, 0, lista)
             self.view.setItem(rows, 1, QTableWidgetItem("Modyfikuj"))
             self.view.setItem(rows, 2, QTableWidgetItem("Usuń"))
 
         self.last_row = self.view.rowCount()
         self.view.setRowCount(self.last_row + 1)
-        lista_strefy = QComboBox(self)
-        lista_strefy.addItems(['', 'A', 'B', 'C', 'AB', 'ABC'])
-        self.view.setCellWidget(self.last_row, 0, lista_strefy)
+        lista = QComboBox(self)
+        lista.addItems(['', 'A', 'B', 'C', 'AB', 'ABC'])
+        self.view.setCellWidget(self.last_row, 0, lista)
         self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
 
         self.view.resizeColumnsToContents()
@@ -682,7 +828,7 @@ class Zone(FunctionWindow):
         elif item.data() == "Modyfikuj":
             try:
                 cur = self.conn.cursor()
-                cur.execute("UPDATE strefy SET tyo_strefy = '" + self.view.item(item.row(), 0).text() + "' WHERE typ_strefy = " + self.data[item.row()][0] + ";")
+                cur.execute("UPDATE strefy SET typ_strefy = '" + self.view.item(item.row(), 0).text() + "' WHERE typ_strefy = '" + self.data[item.row()][0] + "';")
                 self.conn.commit()
                 cur.close()
                 self.close()
@@ -717,6 +863,24 @@ class KierowcyPojazdy(FunctionWindow):
             rows = self.view.rowCount()
             self.view.setRowCount(rows + 1)
             for i, _ in enumerate([str(item[0]), str(item[1]), str(item[2]), str(item[3]), item[4], "Modyfikuj", "Usuń"]):
+                if i == 0:
+                    lista_pojazdy = QComboBox(self)
+                    ids = select_from_db("id_pojazdu", "pojazdy", conn)
+                    lista_pojazdy.addItem(str(item[0]))
+                    for id in ids:
+                        if id[0] != item[0]:
+                            lista_pojazdy.addItem(str(id[0]))
+                    self.view.setCellWidget(rows, i, lista_pojazdy)
+                    continue
+                if i == 4:
+                    lista_pesele = QComboBox(self)
+                    pesele = select_from_db("pesel", "kierowcy", conn)
+                    lista_pesele.addItem(item[4])
+                    for id in pesele:
+                        if id[0] != item[4]:
+                            lista_pesele.addItem(id[0])
+                    self.view.setCellWidget(rows, i, lista_pesele)
+                    continue
                 self.view.setItem(rows, i, QTableWidgetItem(_))
 
         self.last_row = self.view.rowCount()
@@ -731,7 +895,6 @@ class KierowcyPojazdy(FunctionWindow):
 
         lista_pesele = QComboBox(self)
         pesele = select_from_db("pesel", "kierowcy", conn)
-        print("kp")
         lista_pesele.addItem("")
         for item in pesele:
             lista_pesele.addItem(item[0])
@@ -755,7 +918,12 @@ class KierowcyPojazdy(FunctionWindow):
         elif item.data() == "Modyfikuj":
             try:
                 cur = self.conn.cursor()
-                cur.execute("UPDATE strefy SET tyo_strefy = '" + self.view.item(item.row(), 0).text() + "' WHERE typ_strefy = " + self.data[item.row()][0] + ";")
+                id_pojazdu = self.view.cellWidget(item.row(), 0).currentText()
+                cur.execute("UPDATE kierowcy_i_pojazdy SET pojazdy_id_pojazdu = " + id_pojazdu + ", pojazdy_linie_id_linii = (SELECT linie_id_linii FROM pojazdy WHERE id_pojazdu = " + id_pojazdu +
+                            "), pojazdy_id_modelu = (SELECT modele_poj_id_modelu FROM pojazdy WHERE id_pojazdu = " + id_pojazdu + "), "
+                            "pojazdy_id_producenta = (SELECT modele_poj_prod_id_producenta FROM pojazdy WHERE id_pojazdu = " + id_pojazdu + "), "
+                            "kierowcy_pesel = '" + self.view.cellWidget(item.row(), 4).currentText() + "' WHERE pojazdy_id_pojazdu = " + str(self.data[item.row()][0]) +
+                            " AND kierowcy_pesel = '" + self.data[item.row()][4] + "';")
                 self.conn.commit()
                 cur.close()
                 self.close()
@@ -767,7 +935,9 @@ class KierowcyPojazdy(FunctionWindow):
         try:
             item = self.view.cellWidget
             cur = self.conn.cursor()
-            cur.execute("INSERT INTO strefy VALUES('" + item(self.last_row, 0).currentText() + "');")
+            cur.execute("INSERT INTO kierowcy_i_pojazdy VALUES(" + item(self.last_row, 0).currentText() + ", (SELECT linie_id_linii FROM pojazdy WHERE id_pojazdu = " + item(self.last_row, 0).currentText() + "), "
+                        "(SELECT modele_poj_id_modelu FROM pojazdy WHERE id_pojazdu = " + item(self.last_row, 0).currentText() + "), "
+                        "(SELECT modele_poj_prod_id_producenta FROM pojazdy WHERE id_pojazdu = " + item(self.last_row, 0).currentText() + "), "+ item(self.last_row, 4).currentText() + ");")
             self.conn.commit()
             cur.close()
             self.close()

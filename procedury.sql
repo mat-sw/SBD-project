@@ -7,7 +7,7 @@ CREATE SEQUENCE bilet_seq START 1;
 CREATE SEQUENCE biletomat_seq START 1;
 CREATE SEQUENCE model_seq START 1;
 
--- FUNCTIONS
+-- PROCEDURES
 CREATE OR REPLACE FUNCTION UzupelnijCeny()
 	RETURNS TRIGGER
 	LANGUAGE PLPGSQL
@@ -59,3 +59,13 @@ CREATE TRIGGER UzupelnijCene
 CREATE TRIGGER ObliczGestosc
 	AFTER INSERT ON miasta
 	EXECUTE PROCEDURE GestoscZaludnienia();
+	
+-- FUNCTIONS
+-- zwraca sumę miejsc stojących i siedzących
+CREATE OR REPLACE FUNCTION sum_sits(id_mod integer)
+    RETURNS integer
+    LANGUAGE PLPGSQL
+AS $$
+BEGIN
+	RETURN (SELECT liczba_miejsc_siedzacych + liczba_miejsc_stojacych FROM modele_pojazdow WHERE id_modelu = id_mod);
+END; $$
