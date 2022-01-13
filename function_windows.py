@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox
+from PyQt5.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QDateEdit
+from PyQt5 import QtCore
 from FunctionWindow import FunctionWindow
 import sys
 import numpy as np
@@ -9,6 +10,7 @@ DB_PORT = 5432
 DB_NAME = "KomunikacjaMiejska"
 DB_USER = "postgres"
 DB_PASS = "postgres"
+DATE_FORMAT = 'yyyy-MM-dd'
 width = 1000
 height = 600
 pos = np.array([1920 / 2 - width / 2, 1080 / 2 - height / 2])
@@ -266,6 +268,13 @@ class Pojazdy(FunctionWindow):
                             lista_bil.addItem(str(id[0]))
                     self.view.setCellWidget(rows, i, lista_bil)
                     continue
+                if i == 5:
+                    daty = QDateEdit(self)
+                    daty.setCalendarPopup(True)
+                    daty.setDisplayFormat(DATE_FORMAT)
+                    daty.setDate(QtCore.QDate(int(_[0:4]), int(_[5:7]), int(_[8:10])))
+                    self.view.setCellWidget(rows, i, daty)
+                    continue
                 if i == 6:
                     lista = QComboBox(self)
                     lista.addItem(str(item[i]))
@@ -295,6 +304,13 @@ class Pojazdy(FunctionWindow):
                 for item in ids:
                     lista.addItem(str(item[0]))
                 self.view.setCellWidget(self.last_row, i, lista)
+                continue
+            if i == 5:
+                daty = QDateEdit(self)
+                daty.setCalendarPopup(True)
+                daty.setDisplayFormat(DATE_FORMAT)
+                daty.setDate(QtCore.QDate.currentDate())
+                self.view.setCellWidget(self.last_row, i, daty)
                 continue
             if i == 6:
                 lista = QComboBox(self)
@@ -328,7 +344,7 @@ class Pojazdy(FunctionWindow):
                     bil = "null"
                 command = "UPDATE pojazdy SET id_pojazdu = " + self.view.item(item.row(), 0).text() + ", max_liczba_osob = (SELECT sum_sits("+ self.view.cellWidget(item.row(), 6).currentText() + ")), "\
                 "linie_id_linii = " + self.view.cellWidget(item.row(), 2).currentText() + ", biletomaty_id_biletomatu = " + bil + ", rok_produkcji = " + self.view.item(item.row(), 4).text() +\
-                ", data_waznosci_przegladu = to_date('" + self.view.item(item.row(), 5).text() + "', 'YYYY-MM-DD'), modele_poj_id_modelu = " + self.view.cellWidget(item.row(), 6).currentText() +\
+                ", data_waznosci_przegladu = to_date('" + self.view.cellWidget(item.row(), 5).text() + "', 'YYYY-MM-DD'), modele_poj_id_modelu = " + self.view.cellWidget(item.row(), 6).currentText() +\
                 ", modele_poj_prod_id_producenta = " + self.view.item(item.row(), 7).text() + " WHERE id_pojazdu = " + str(self.data[item.row()][0]) + ";"
                 cur = self.conn.cursor()
                 print(command)
@@ -390,6 +406,13 @@ class Kierowcy(FunctionWindow):
                             lista.addItem(id)
                     self.view.setCellWidget(rows, i, lista)
                     continue
+                if i == 7:
+                    daty = QDateEdit(self)
+                    daty.setCalendarPopup(True)
+                    daty.setDisplayFormat(DATE_FORMAT)
+                    daty.setDate(QtCore.QDate(int(_[0:4]), int(_[5:7]), int(_[8:10])))
+                    self.view.setCellWidget(rows, i, daty)
+                    continue
                 if i == 8:
                     lista = QComboBox(self)
                     lista.addItem(item[i])
@@ -412,6 +435,13 @@ class Kierowcy(FunctionWindow):
                 lista = QComboBox(self)
                 lista.addItems(["", "tak", "nie"])
                 self.view.setCellWidget(self.last_row, i, lista)
+                continue
+            if i == 7:
+                daty = QDateEdit(self)
+                daty.setCalendarPopup(True)
+                daty.setDisplayFormat(DATE_FORMAT)
+                daty.setDate(QtCore.QDate.currentDate())
+                self.view.setCellWidget(self.last_row, i, daty)
                 continue
             if i == 8:
                 lista = QComboBox(self)
@@ -439,7 +469,7 @@ class Kierowcy(FunctionWindow):
                 command = "UPDATE kierowcy SET pesel = '" + self.view.item(item.row(), 0).text() + "', imie = '" + self.view.item(item.row(), 1).text() + "', nazwisko = '" + self.view.item(item.row(), 2).text() + "', "\
                 "plec = '" + self.view.cellWidget(item.row(), 3).currentText() + "', uprawnienia_autobusowe = '" + self.view.cellWidget(item.row(), 4).currentText() + "'"\
                 ", uprawnienia_tramwajowe = '" + self.view.cellWidget(item.row(), 5).currentText() + "', placa = " + self.view.item(item.row(), 6).text() +\
-                ", data_zatrudnienia = to_date('" + self.view.item(item.row(), 7).text() + "', 'YYYY-MM-DD'), stan_cywilny = '" + self.view.cellWidget(item.row(), 8).currentText() + "' WHERE pesel = '" + self.data[item.row()][0] + "';"
+                ", data_zatrudnienia = to_date('" + self.view.cellWidget(item.row(), 7).text() + "', 'YYYY-MM-DD'), stan_cywilny = '" + self.view.cellWidget(item.row(), 8).currentText() + "' WHERE pesel = '" + self.data[item.row()][0] + "';"
                 cur = self.conn.cursor()
                 print(command)
                 cur.execute(command)
