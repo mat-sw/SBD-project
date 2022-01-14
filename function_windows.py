@@ -254,9 +254,9 @@ class Kasy(FunctionWindow):
                 if i == 3:
                     lista = QComboBox(self)
                     ids = select_from_db("id_przystanku", "przystanki", conn)
-                    lista.addItem(str(item[0]))
+                    lista.addItem(_)
                     for id in ids:
-                        if id[0] != item[0]:
+                        if str(id[0]) != _:
                             lista.addItem(str(id[0]))
                     self.view.setCellWidget(rows, i, lista)
                     continue
@@ -584,7 +584,114 @@ class Kolejnosc(FunctionWindow):
     def __init__(self, conn):
         super(Kolejnosc, self).__init__()
         self.initialze_grid()
+
+        self.conn = conn
+        self.labels = ["Kolejnosc", "ID Linii", "ID przystanku", "Miasto", "Strefa"]
+        self.data = select_from_db("*", "przystanki_w_linii", self.conn)
+        self.view.setColumnCount(len(self.labels) + 2)
+        self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
+        for item in self.data:
+            rows = self.view.rowCount()
+            self.view.setRowCount(rows + 1)
+            for i, _ in enumerate([str(item[0]), str(item[1]), str(item[2]), item[3], item[4], "Modyfikuj", "Usuń"]):
+                if i == 1:
+                    lista = QComboBox(self)
+                    ids = select_from_db("id_linii", "linie", conn)
+                    lista.addItem(_)
+                    for id in ids:
+                        if str(id[0]) != _:
+                            lista.addItem(str(id[0]))
+                    self.view.setCellWidget(rows, i, lista)
+                    continue
+                if i == 2:
+                    lista = QComboBox(self)
+                    ids = select_from_db("id_przystanku", "przystanki", conn)
+                    lista.addItem(_)
+                    for id in ids:
+                        if str(id[0]) != _:
+                            lista.addItem(str(id[0]))
+                    self.view.setCellWidget(rows, i, lista)
+                    continue
+                self.view.setItem(rows, i, QTableWidgetItem(_))
+
+        self.last_row = self.view.rowCount()
+        self.view.setRowCount(self.last_row + 1)
+
+        for i in range(0, len(self.labels)-2):
+            if i == 1:
+                lista = QComboBox(self)
+                ids = select_from_db("id_linii", "linie", conn)
+                lista.addItem("")
+                for id in ids:
+                    lista.addItem(str(id[0]))
+                self.view.setCellWidget(self.last_row, i, lista)
+                continue
+            if i == 2:
+                lista = QComboBox(self)
+                ids = select_from_db("id_przystanku", "przystanki", conn)
+                lista.addItem("")
+                for id in ids:
+                    lista.addItem(str(id[0]))
+                self.view.setCellWidget(self.last_row, i, lista)
+                continue
+            self.view.setCellWidget(self.last_row, i, QLineEdit())
+        self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
+
+        self.view.resizeColumnsToContents()
+        self.get_signal()
         self.setup(pos + 50, size, "kolejność przystanków")
+
+    def modify(self, item):
+        if item.data() == "Usuń":
+            try:
+                command = "DELETE FROM przystanki_w_linii WHERE kolejnosc = " + str(self.data[item.row()][0]) + "AND linie_id_linii = " + str(self.data[item.row()][1]) + ";"
+                cur = self.conn.cursor()
+                print(command)
+                cur.execute(command)
+                self.conn.commit()
+                cur.close()
+                self.close()
+            except (Exception, psycopg2.DatabaseError) as error:
+                print("Error: %s", error)
+                print("Cannot delete this record")
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
+                self.conn.rollback()
+        elif item.data() == "Modyfikuj":
+            try:
+                id_przys = self.view.cellWidget(item.row(), 2).currentText()
+                command = "UPDATE przystanki_w_linii SET kolejnosc = " + self.view.item(item.row(), 0).text() + ", linie_id_linii = " + self.view.cellWidget(item.row(), 1).currentText() + "," \
+                          "przystanki_id_przystanku = "+ id_przys + "przystanki_miasta_nazwa_miasta = (SELECT miasta_nazwa_miasta FROM przystanki WHERE id_przystanku = " + id_przys + "), " \
+                          "przystanki_strefy_typ_strefy = (SELECT strefy_typ_strefy FROM przystanki WHERE id_przystanku = " + id_przys + ") WHERE kolejnosc = " + str(self.data[item.row()][0]) + "AND linie_id_linii = " + str(self.data[item.row()][1]) + ";"
+                cur = self.conn.cursor()
+                print(command)
+                cur.execute(command)
+                self.conn.commit()
+                cur.close()
+                self.close()
+            except(Exception, psycopg2.DatabaseError) as error:
+                print(error)
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
+                self.conn.rollback()
+
+    def add_to_db(self):
+        try:
+            item = self.view.cellWidget
+            id_przys = item(self.last_row, 2).currentText()
+            command = "INSERT INTO przystanki_w_linii VALUES("+ item(self.last_row, 0).text() + ", " + item(self.last_row, 1).currentText() + ", " + id_przys + ", " + \
+                      "(SELECT miasta_nazwa_miasta FROM przystanki WHERE id_przystanku = " + id_przys + "), (SELECT strefy_typ_strefy FROM przystanki WHERE id_przystanku = " + id_przys + "));"
+            cur = self.conn.cursor()
+            print(command)
+            cur.execute(command)
+            self.conn.commit()
+            cur.close()
+            self.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+            self.info_label.setText(str(error))
+            self.info_label.setVisible(True)
+            self.conn.rollback()
 
 
 class Linie(FunctionWindow):
