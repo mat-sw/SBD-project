@@ -1201,7 +1201,117 @@ class Przyjazdy(FunctionWindow):
     def __init__(self, conn):
         super(Przyjazdy, self).__init__()
         self.initialze_grid()
+
+        # self.conn = conn
+        # self.labels = ["ID przyjazdu", "Godzina przyjazdu", "ID linii", "Kolejność w linii", "ID przystanku", "Miasto", "Strefa"]
+        # self.data = select_from_db("*", "przystanki", self.conn)
+        # self.view.setColumnCount(len(self.labels) + 2)
+        # self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
+        # for item in self.data:
+        #     rows = self.view.rowCount()
+        #     self.view.setRowCount(rows + 1)
+        #     for i, _ in enumerate([str(item[0]), item[1], item[2], item[3], item[4], str(item[5]), item[6], "Modyfikuj", "Usuń"]):
+        #         if i == 2:
+        #             lista = QComboBox(self)
+        #             ids = select_from_db("linie_id_linii", "przystanki_w_linii", conn)
+        #             lista.addItem(_)
+        #             for id in ids:
+        #                 if id[0] != _:
+        #                     lista.addItem(str(id[0]))
+        #             self.view.setCellWidget(rows, i, lista)
+        #             continue
+        #         if i == 3:
+        #             lista = QComboBox(self)
+        #             ids = select_from_db("kolejnosc", "przystanki_w_linii", conn)
+        #             lista.addItem(_)
+        #             for id in ids:
+        #                 if id[0] != _:
+        #                     lista.addItem(str(id[0]))
+        #             self.view.setCellWidget(rows, i, lista)
+        #             continue
+        #         if i == 4:
+        #             lista = QComboBox(self)
+        #             ids = select_from_db("przystanki_id_przystanku", "przystanki_w_linii", conn)
+        #             lista.addItem(_)
+        #             for id in ids:
+        #                 if id[0] != _:
+        #                     lista.addItem(str(id[0]))
+        #             self.view.setCellWidget(rows, i, lista)
+        #             continue
+        #         if i == 5:
+        #             lista = QComboBox(self)
+        #             ids = select_from_db("przystanki_miasta_nazwa_miasta", "przystanki_w_linii", conn)
+        #             lista.addItem(_)
+        #             for id in ids:
+        #                 if id[0] != _:
+        #                     lista.addItem(str(id[0]))
+        #             self.view.setCellWidget(rows, i, lista)
+        #             continue
+        #         if i == 6:
+        #             lista_stref = QComboBox(self)
+        #             lista_stref.addItem(_)
+        #             for id in ['A', 'B', 'C']:
+        #                 if id != _:
+        #                     lista_stref.addItem(id)
+        #             self.view.setCellWidget(rows, i, lista_stref)
+        #             continue
+        #         self.view.setItem(rows, i, QTableWidgetItem(_))
+        #
+        # self.last_row = self.view.rowCount()
+        # self.view.setRowCount(self.last_row + 1)
+        # for i in range(1, len(self.labels)):
+        #     self.view.setCellWidget(self.last_row, i, QLineEdit())
+        # self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
+        #
+        # self.view.resizeColumnsToContents()
+        # self.get_signal()
         self.setup(pos + 50, size, "Przyjazdy")
+
+    # def modify(self, item):
+    #     if item.data() == "Usuń":
+    #         try:
+    #             delete_from_db("przyjazdy", "id_przyjazdu", self.data[item.row()][0], self.conn)
+    #             self.close()
+    #         except (Exception, psycopg2.DatabaseError) as error:
+    #             print("Error: %s", error)
+    #             print("Cannot delete this record")
+    #             self.info_label.setText(str(error))
+    #             self.info_label.setVisible(True)
+    #             self.conn.rollback()
+    #     elif item.data() == "Modyfikuj":
+    #         try:
+    #             command = "UPDATE przyjazdy SET id_przyjazdu = " + self.view.item(item.row(), 0).text() + ", data_przyjazdu = '" + self.view.item(item.row(), 1).text() + "', " \
+    #                        "pwl_linie_id_linii = '" + self.view.cellWidget(item.row(), 2).currentText() + "', pwl_kolejnosc = '" + self.view.cellWidget(item.row(), 3).currentText() + "', " \
+    #                        "pwl_przystanki_id_przystanku = '" + self.view.cellWidget(item.row(), 4).currentText() + "', pwl_przystanki_nazwa_miasta = '" + self.view.cellWidget(item.row(), 5).currentText() + "', " \
+    #                        "strefy_typ_strefy = '" + self.view.cellWidget(item.row(), 6).currentText() + "' WHERE id_przyjazdu = " + str(self.data[item.row()][0]) + ";"
+    #             cur = self.conn.cursor()
+    #             print(command)
+    #             cur.execute(command)
+    #             self.conn.commit()
+    #             cur.close()
+    #             self.close()
+    #         except(Exception, psycopg2.DatabaseError) as error:
+    #             print(error)
+    #             self.info_label.setText(str(error))
+    #             self.info_label.setVisible(True)
+    #             self.conn.rollback()
+    #
+    # def add_to_db(self):
+    #     try:
+    #         item = self.view.cellWidget
+    #         row = self.last_row
+    #         command = "INSERT INTO przyjazdy VALUES(NEXTVAL('producer_seq'), '" + item(row, 3).currentText() + "', '" + item(row, 2).currentText() + "', '" + item(row, 4).currentText() + "', '" + item(row, 5).currentText() + "', '" + item(row, 0).text() + "', '" + item(row, 1).text() + "', '" + item(row, 6).currentText() + "');"
+    #         cur = self.conn.cursor()
+    #         print(command)
+    #         cur.execute(command)
+    #         self.conn.commit()
+    #         cur.close()
+    #         self.close()
+    #     except (Exception, psycopg2.DatabaseError) as error:
+    #         print(error)
+    #         self.info_label.setText(str(error))
+    #         self.info_label.setVisible(True)
+    #         self.conn.rollback()
 
 
 class Przystanki(FunctionWindow):

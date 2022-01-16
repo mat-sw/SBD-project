@@ -50,8 +50,8 @@ ALTER TABLE bilety ADD CONSTRAINT bilet_pk PRIMARY KEY ( id_biletu );
 
 CREATE TABLE kasy_biletowe (
     id_kasy                         INTEGER NOT NULL,
-    godzina_otwarcia                DATE NOT NULL,
-    godzina_zamkniecia              DATE NOT NULL,
+    godzina_otwarcia                TIME NOT NULL,
+    godzina_zamkniecia              TIME NOT NULL,
     przystanki_id_przystanku        INTEGER,
     przystanki_miasta_nazwa_miasta  VARCHAR(30),
     przystanki_strefy_typ_strefy    type_typ_strefy NOT NULL
@@ -153,7 +153,7 @@ CREATE TABLE przyjazdy (
     pwl_przystanki_id_przystanku  INTEGER NOT NULL,
     pwl_przystanki_nazwa_miasta   VARCHAR(30) NOT NULL,
     id_przyjazdu                  INTEGER NOT NULL,
-    data_przyjazdu                DATE NOT NULL,
+    data_przyjazdu                TIME NOT NULL,
     pwl_przyst_strefy_typ_strefy  type_typ_strefy NOT NULL
 );
 
