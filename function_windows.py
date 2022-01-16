@@ -1203,7 +1203,7 @@ class Przyjazdy(FunctionWindow):
         self.initialze_grid()
         self.conn = conn
         self.labels = ["ID przyjazdu", "ID Linii", "Kolejność w linii", "Godzina przyjazdu", "ID przystanku", "Miasto", "Strefa"]
-        self.data = select_from_db("SELECT * FROM przyjazdy;", self.conn)
+        self.data = select_from_db("SELECT * FROM przyjazdy ORDER BY 2, 1;", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
