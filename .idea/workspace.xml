@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7a36a7b0-3ac1-4de7-8373-ff21d6d18e25" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f73512d9-11b7-4919-9997-a594438613e7.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f73512d9-11b7-4919-9997-a594438613e7.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/inserty.sql" beforeDir="false" afterPath="$PROJECT_DIR$/inserty.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/function_windows.py" beforeDir="false" afterPath="$PROJECT_DIR$/function_windows.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,9 +52,9 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Users\julia\AppData\Local\Programs\Python\Python38\python.exe" />
+      <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
@@ -116,8 +114,8 @@
       <workItem from="1642092340073" duration="11612000" />
       <workItem from="1642154343848" duration="3167000" />
       <workItem from="1642290485711" duration="2239000" />
-      <workItem from="1642339297665" duration="6781000" />
-      <workItem from="1642349087128" duration="1012000" />
+      <workItem from="1642339297665" duration="7973000" />
+      <workItem from="1642351360375" duration="504000" />
     </task>
     <task id="LOCAL-00001" summary="(main / login) window">
       <created>1639518277824</created>
@@ -357,14 +355,20 @@
       <option name="project" value="LOCAL" />
       <updated>1642347889710</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="przyjazdy order by">
+      <created>1642348966904</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1642348966904</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="zamiana na polski tekst" />
     <MESSAGE value="wstępny wygląd z tabelką" />
     <MESSAGE value="rozmiar przycisków" />
     <MESSAGE value="poprawiony rozmiar przycisków" />
@@ -389,12 +393,13 @@
     <MESSAGE value="zostały dwie klasy" />
     <MESSAGE value="poprawione przyjazdy" />
     <MESSAGE value="poprawione przyjazdy #2" />
-    <option name="LAST_COMMIT_MESSAGE" value="poprawione przyjazdy #2" />
+    <MESSAGE value="przyjazdy order by" />
+    <option name="LAST_COMMIT_MESSAGE" value="przyjazdy order by" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/SBD_project$main.coverage" NAME="main Coverage Results" MODIFIED="1641735970806" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/function_windows_py$main.coverage" NAME="main Coverage Results" MODIFIED="1642349887284" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/main_windows_py$main.coverage" NAME="main Coverage Results" MODIFIED="1639990667950" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/SBD_project$main.coverage" NAME="main Coverage Results" MODIFIED="1641735970806" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1641160776950" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/function_windows_py$main.coverage" NAME="main Coverage Results" MODIFIED="1642351635801" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

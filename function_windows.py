@@ -660,8 +660,8 @@ class Kolejnosc(FunctionWindow):
         elif item.data() == "Modyfikuj":
             try:
                 id_przys = self.view.cellWidget(item.row(), 2).currentText()
-                command = "UPDATE przystanki_w_linii SET kolejnosc = " + self.view.item(item.row(), 0).text() + ", linie_id_linii = " + self.view.cellWidget(item.row(), 1).currentText() + "," \
-                          "przystanki_id_przystanku = "+ id_przys + "przystanki_miasta_nazwa_miasta = (SELECT miasta_nazwa_miasta FROM przystanki WHERE id_przystanku = " + id_przys + "), " \
+                command = "UPDATE przystanki_w_linii SET kolejnosc = " + self.view.item(item.row(), 0).text() + ", linie_id_linii = " + self.view.cellWidget(item.row(), 1).currentText() + ", " \
+                          "przystanki_id_przystanku = "+ id_przys + ", przystanki_miasta_nazwa_miasta = (SELECT miasta_nazwa_miasta FROM przystanki WHERE id_przystanku = " + id_przys + "), " \
                           "przystanki_strefy_typ_strefy = (SELECT strefy_typ_strefy FROM przystanki WHERE id_przystanku = " + id_przys + ") WHERE kolejnosc = " + str(self.data[item.row()][0]) + "AND linie_id_linii = " + str(self.data[item.row()][1]) + ";"
                 cur = self.conn.cursor()
                 print(command)
