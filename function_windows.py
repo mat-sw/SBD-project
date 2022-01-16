@@ -38,9 +38,9 @@ def delete_from_db(db, what, item, conn):
     cur.close()
 
 
-def select_from_db(what, table, conn):
+def select_from_db(command, conn):
     cur = conn.cursor()
-    cur.execute("Select %s from %s ORDER By 1;" % (what, table))
+    cur.execute(command)
     data = cur.fetchall()
     cur.close()
     return data
@@ -53,7 +53,7 @@ class Biletomaty(FunctionWindow):
 
         self.conn = conn
         self.labels = ["ID Biletomatu", "Płatność gotówką", "Płatność kartą"]
-        self.data = select_from_db("*", "biletomaty", self.conn)
+        self.data = select_from_db("SELECT * FROM biletomaty ORDER BY 1", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["",""])
         for item in self.data:
@@ -134,7 +134,7 @@ class Bilety(FunctionWindow):
 
         self.conn = conn
         self.labels = ["ID Biletu", "Czy ulgowy?", "Cena", "Czas przejazdu", "Strefa"]
-        self.data = select_from_db("*", "bilety", self.conn)
+        self.data = select_from_db("SELECT * FROM bilety ORDER BY 1", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + [" ", " "])
         for item in self.data:
@@ -237,7 +237,7 @@ class Kasy(FunctionWindow):
 
         self.conn = conn
         self.labels = ["ID Kasy", "Godzina otwarca", "Godzina zamknięcia", "ID przystanku", "Miasto", "Strefa"]
-        self.data = select_from_db("*", "kasy_biletowe", self.conn)
+        self.data = select_from_db("SELECT * FROM kasy_biletowe ORDER BY 1", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
@@ -253,7 +253,7 @@ class Kasy(FunctionWindow):
                     continue
                 if i == 3:
                     lista = QComboBox(self)
-                    ids = select_from_db("id_przystanku", "przystanki", conn)
+                    ids = select_from_db("SELECT id_przystanku FROM przystanki ORDER BY 1", conn)
                     lista.addItem(_)
                     for id in ids:
                         if str(id[0]) != _:
@@ -274,7 +274,7 @@ class Kasy(FunctionWindow):
                 continue
             if i == 3:
                 lista = QComboBox(self)
-                ids = select_from_db("id_przystanku", "przystanki", conn)
+                ids = select_from_db("SELECT id_przystanku FROM przystanki ORDER BY 1", conn)
                 lista.addItem("")
                 for id in ids:
                     lista.addItem(str(id[0]))
@@ -348,7 +348,7 @@ class Kierowcy(FunctionWindow):
 
         self.conn = conn
         self.labels = ["Pesel", "Imie", "Nazwisko", "Płeć", "Czy prowadzi autbous", "Czy prowadzi tramwaj", "Wynagrodzenie", "Data zatrudnienia", "Stan_cywilny"]
-        self.data = select_from_db("*", "kierowcy", self.conn)
+        self.data = select_from_db("SELECT * FROM kierowcy ORDER BY 3, 2", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
@@ -475,7 +475,7 @@ class KierowcyPojazdy(FunctionWindow):
 
         self.conn = conn
         self.labels = ["ID Pojazdu", "ID Linii", "ID Modelu", "ID producenta", "Pesel kierowcy"]
-        self.data = select_from_db("*", "kierowcy_i_pojazdy", self.conn)
+        self.data = select_from_db("SELECT * FROM kierowcy_i_pojazdy ORDER BY 1, 5", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
@@ -484,7 +484,7 @@ class KierowcyPojazdy(FunctionWindow):
             for i, _ in enumerate([str(item[0]), str(item[1]), str(item[2]), str(item[3]), item[4], "Modyfikuj", "Usuń"]):
                 if i == 0:
                     lista_pojazdy = QComboBox(self)
-                    ids = select_from_db("id_pojazdu", "pojazdy", conn)
+                    ids = select_from_db("SELECT id_pojazdu FROM pojazdy", conn)
                     lista_pojazdy.addItem(str(item[0]))
                     for id in ids:
                         if id[0] != item[0]:
@@ -493,7 +493,7 @@ class KierowcyPojazdy(FunctionWindow):
                     continue
                 if i == 4:
                     lista_pesele = QComboBox(self)
-                    pesele = select_from_db("pesel", "kierowcy", conn)
+                    pesele = select_from_db("SELECT pesel FROM kierowcy", conn)
                     lista_pesele.addItem(item[4])
                     for id in pesele:
                         if id[0] != item[4]:
@@ -506,14 +506,14 @@ class KierowcyPojazdy(FunctionWindow):
         self.view.setRowCount(self.last_row + 1)
 
         lista_pojazdy = QComboBox(self)
-        ids = select_from_db("id_pojazdu", "pojazdy", conn)
+        ids = select_from_db("SELECT id_pojazdu FROM pojazdy", conn)
         lista_pojazdy.addItem("")
         for item in ids:
             lista_pojazdy.addItem(str(item[0]))
         self.view.setCellWidget(self.last_row, 0, lista_pojazdy)
 
         lista_pesele = QComboBox(self)
-        pesele = select_from_db("pesel", "kierowcy", conn)
+        pesele = select_from_db("SELECT pesel FROM kierowcy", conn)
         lista_pesele.addItem("")
         for item in pesele:
             lista_pesele.addItem(item[0])
@@ -587,7 +587,7 @@ class Kolejnosc(FunctionWindow):
 
         self.conn = conn
         self.labels = ["Kolejnosc", "ID Linii", "ID przystanku", "Miasto", "Strefa"]
-        self.data = select_from_db("*", "przystanki_w_linii", self.conn)
+        self.data = select_from_db("SELECT * FROM przystanki_w_linii ORDER BY 2, 1", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
@@ -596,7 +596,7 @@ class Kolejnosc(FunctionWindow):
             for i, _ in enumerate([str(item[0]), str(item[1]), str(item[2]), item[3], item[4], "Modyfikuj", "Usuń"]):
                 if i == 1:
                     lista = QComboBox(self)
-                    ids = select_from_db("id_linii", "linie", conn)
+                    ids = select_from_db("SELECT id_linii FROM linie", conn)
                     lista.addItem(_)
                     for id in ids:
                         if str(id[0]) != _:
@@ -605,7 +605,7 @@ class Kolejnosc(FunctionWindow):
                     continue
                 if i == 2:
                     lista = QComboBox(self)
-                    ids = select_from_db("id_przystanku", "przystanki", conn)
+                    ids = select_from_db("SELECT id_przystanku FROM przystanki", conn)
                     lista.addItem(_)
                     for id in ids:
                         if str(id[0]) != _:
@@ -620,7 +620,7 @@ class Kolejnosc(FunctionWindow):
         for i in range(0, len(self.labels)-2):
             if i == 1:
                 lista = QComboBox(self)
-                ids = select_from_db("id_linii", "linie", conn)
+                ids = select_from_db("SELECT id_linii FROM linie", conn)
                 lista.addItem("")
                 for id in ids:
                     lista.addItem(str(id[0]))
@@ -628,7 +628,7 @@ class Kolejnosc(FunctionWindow):
                 continue
             if i == 2:
                 lista = QComboBox(self)
-                ids = select_from_db("id_przystanku", "przystanki", conn)
+                ids = select_from_db("SELECT id_przystanku FROM przystanki", conn)
                 lista.addItem("")
                 for id in ids:
                     lista.addItem(str(id[0]))
@@ -701,7 +701,7 @@ class Linie(FunctionWindow):
 
         self.conn = conn
         self.labels = ["ID linii", "Typ linii"]
-        self.data = select_from_db("*", "linie", self.conn)
+        self.data = select_from_db("SELECT * FROM linie", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
@@ -782,7 +782,7 @@ class Miasta(FunctionWindow):
 
         self.conn = conn
         self.labels = ["Nazwa", "Status", "Liczba mieszkańców", "Powierzchnia", "Gęstość zaludnienia"]
-        self.data = select_from_db("*", "miasta", self.conn)
+        self.data = select_from_db("SELECT * FROM miasta ORDER BY 1", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
@@ -868,7 +868,7 @@ class Modele(FunctionWindow):
 
         self.conn = conn
         self.labels = ["ID Modelu", "Nazwa Modelu", "Typ pojazdu", "Czy niskopodłogowy", "Miejsca siedzące", "Miejsca stojące", "ID producenta"]
-        self.data = select_from_db("*", "modele_pojazdow", self.conn)
+        self.data = select_from_db("SELECT * FROM modele_pojazdow ORDER BY 1", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
@@ -894,7 +894,7 @@ class Modele(FunctionWindow):
                 if i == 6:
                     lista = QComboBox(self)
                     lista.addItem(str(item[i]))
-                    ids = select_from_db("id_producenta", "producenci", conn)
+                    ids = select_from_db("SELECT id_producenta FROM producenci", conn)
                     for id in ids:
                         if id[0] != item[i]:
                             lista.addItem(str(id[0]))
@@ -917,7 +917,7 @@ class Modele(FunctionWindow):
                 continue
             if i == 6:
                 lista = QComboBox(self)
-                ids = select_from_db("id_producenta", "producenci", conn)
+                ids = select_from_db("SELECT id_producenta FROM producenci", conn)
                 lista.addItem("")
                 for item in ids:
                     lista.addItem(str(item[0]))
@@ -934,7 +934,7 @@ class Modele(FunctionWindow):
     def modify(self, item):
         if item.data() == "Usuń":
             try:
-                delete_from_db("modele_pojazdow", "id_modelu", self.data[item.row()][0], self.conn)
+                delete_from_db("modele_pojazdow", "id_modelu", str(self.data[item.row()][0]), self.conn)
                 self.close()
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
@@ -985,7 +985,7 @@ class Pojazdy(FunctionWindow):
 
         self.conn = conn
         self.labels = ["ID pojazdu", "Max liczba osob", "ID Linii", "ID biletomatu", "Rok produkcji", "Data waznosci przegladu", "ID modelu", "ID producenta"]
-        self.data = select_from_db("*", "pojazdy", self.conn)
+        self.data = select_from_db("SELECT * FROM pojazdy ORDER BY 1", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
@@ -995,7 +995,7 @@ class Pojazdy(FunctionWindow):
                 if i == 2:
                     lista_linii = QComboBox(self)
                     lista_linii.addItem(str(item[i]))
-                    ids = select_from_db("id_linii", "linie", conn)
+                    ids = select_from_db("SELECT id_linii FROM linie", conn)
                     for id in ids:
                         if id[0] != item[i]:
                             lista_linii.addItem(str(id[0]))
@@ -1007,7 +1007,7 @@ class Pojazdy(FunctionWindow):
                         lista_bil.addItem('-')
                     else:
                         lista_bil.addItems([_, '-'])
-                    ids = select_from_db("id_biletomatu", "biletomaty", conn)
+                    ids = select_from_db("SELECT id_biletomatu FROM biletomaty", conn)
                     for id in ids:
                         if str(id[0]) != _:
                             lista_bil.addItem(str(id[0]))
@@ -1023,7 +1023,7 @@ class Pojazdy(FunctionWindow):
                 if i == 6:
                     lista = QComboBox(self)
                     lista.addItem(str(item[i]))
-                    ids = select_from_db("id_modelu", "modele_pojazdow", conn)
+                    ids = select_from_db("SELECT id_modelu FROm modele_pojazdow", conn)
                     for id in ids:
                         if id[0] != item[i]:
                             lista.addItem(str(id[0]))
@@ -1036,7 +1036,7 @@ class Pojazdy(FunctionWindow):
         for i in range(2, len(self.labels)-1):
             if i == 2:
                 lista = QComboBox(self)
-                ids = select_from_db("id_linii", "linie", conn)
+                ids = select_from_db("SELECT id_linii FROM linie", conn)
                 lista.addItem("")
                 for item in ids:
                     lista.addItem(str(item[0]))
@@ -1044,7 +1044,7 @@ class Pojazdy(FunctionWindow):
                 continue
             if i == 3:
                 lista = QComboBox(self)
-                ids = select_from_db("id_biletomatu", "biletomaty", conn)
+                ids = select_from_db("SELECT id_biletomatu FROM biletomaty", conn)
                 lista.addItem("")
                 for item in ids:
                     lista.addItem(str(item[0]))
@@ -1059,7 +1059,7 @@ class Pojazdy(FunctionWindow):
                 continue
             if i == 6:
                 lista = QComboBox(self)
-                ids = select_from_db("id_modelu", "modele_pojazdow", conn)
+                ids = select_from_db("SELECT id_modelu FROm modele_pojazdow", conn)
                 lista.addItem("")
                 for item in ids:
                     lista.addItem(str(item[0]))
@@ -1134,7 +1134,7 @@ class Producenci(FunctionWindow):
 
         self.conn = conn
         self.labels = ["ID producenta", "Nazwa"]
-        self.data = select_from_db("*", "producenci", self.conn)
+        self.data = select_from_db("SELECT * FROM producenci", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
@@ -1201,117 +1201,153 @@ class Przyjazdy(FunctionWindow):
     def __init__(self, conn):
         super(Przyjazdy, self).__init__()
         self.initialze_grid()
+        self.conn = conn
+        self.labels = ["ID przyjazdu", "ID Linii", "Kolejność w linii", "Godzina przyjazdu", "ID przystanku", "Miasto", "Strefa"]
+        self.data = select_from_db("SELECT * FROM przyjazdy", self.conn)
+        self.view.setColumnCount(len(self.labels) + 2)
+        self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
+        for item in self.data:
+            rows = self.view.rowCount()
+            self.view.setRowCount(rows + 1)
+            for i, _ in enumerate([str(item[4]), str(item[1]), str(item[0]), str(item[5]), str(item[2]), item[3], item[6], "Modyfikuj", "Usuń"]):
+                if i == 1:
+                    lista = QComboBox(self)
+                    ids = select_from_db("SELECT DISTINCT linie_id_linii FROM przystanki_w_linii;", conn)
+                    # cur = conn.cursor()
+                    # cur.execute()
+                    # ids = cur.fetchall()
+                    # cur.close()
+                    lista.addItem(_)
+                    for id in ids:
+                        if id[0] != _:
+                            lista.addItem(str(id[0]))
+                    self.view.setCellWidget(rows, i, lista)
+                    continue
+                if i == 2:
+                    lista = QComboBox(self)
+                    ids = select_from_db("SELECT kolejnosc FROM przystanki_w_linii WHERE linie_id_linii = "+ str(item[1]) + ";", conn)
+                    # cur = conn.cursor()
+                    # cur.execute("SELECT kolejnosc FROM przystanki_w_linii WHERE linie_id_linii = "+ str(item[1]) + ";")
+                    # ids = cur.fetchall()
+                    # cur.close()
+                    lista.addItem(_)
+                    for id in ids:
+                        if id[0] != _:
+                            lista.addItem(str(id[0]))
+                    self.view.setCellWidget(rows, i, lista)
+                    continue
+                if i == 3:
+                    daty = QTimeEdit(self)
+                    daty.setCalendarPopup(True)
+                    daty.setDisplayFormat(HOUR_FORMAT)
+                    daty.setTime(QtCore.QTime(int(_[0:2]), int(_[3:5]), int(_[6:8])))
+                    self.view.setCellWidget(rows, i, daty)
+                    continue
+                self.view.setItem(rows, i, QTableWidgetItem(_))
 
-        # self.conn = conn
-        # self.labels = ["ID przyjazdu", "Godzina przyjazdu", "ID linii", "Kolejność w linii", "ID przystanku", "Miasto", "Strefa"]
-        # self.data = select_from_db("*", "przystanki", self.conn)
-        # self.view.setColumnCount(len(self.labels) + 2)
-        # self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
-        # for item in self.data:
-        #     rows = self.view.rowCount()
-        #     self.view.setRowCount(rows + 1)
-        #     for i, _ in enumerate([str(item[0]), item[1], item[2], item[3], item[4], str(item[5]), item[6], "Modyfikuj", "Usuń"]):
-        #         if i == 2:
-        #             lista = QComboBox(self)
-        #             ids = select_from_db("linie_id_linii", "przystanki_w_linii", conn)
-        #             lista.addItem(_)
-        #             for id in ids:
-        #                 if id[0] != _:
-        #                     lista.addItem(str(id[0]))
-        #             self.view.setCellWidget(rows, i, lista)
-        #             continue
-        #         if i == 3:
-        #             lista = QComboBox(self)
-        #             ids = select_from_db("kolejnosc", "przystanki_w_linii", conn)
-        #             lista.addItem(_)
-        #             for id in ids:
-        #                 if id[0] != _:
-        #                     lista.addItem(str(id[0]))
-        #             self.view.setCellWidget(rows, i, lista)
-        #             continue
-        #         if i == 4:
-        #             lista = QComboBox(self)
-        #             ids = select_from_db("przystanki_id_przystanku", "przystanki_w_linii", conn)
-        #             lista.addItem(_)
-        #             for id in ids:
-        #                 if id[0] != _:
-        #                     lista.addItem(str(id[0]))
-        #             self.view.setCellWidget(rows, i, lista)
-        #             continue
-        #         if i == 5:
-        #             lista = QComboBox(self)
-        #             ids = select_from_db("przystanki_miasta_nazwa_miasta", "przystanki_w_linii", conn)
-        #             lista.addItem(_)
-        #             for id in ids:
-        #                 if id[0] != _:
-        #                     lista.addItem(str(id[0]))
-        #             self.view.setCellWidget(rows, i, lista)
-        #             continue
-        #         if i == 6:
-        #             lista_stref = QComboBox(self)
-        #             lista_stref.addItem(_)
-        #             for id in ['A', 'B', 'C']:
-        #                 if id != _:
-        #                     lista_stref.addItem(id)
-        #             self.view.setCellWidget(rows, i, lista_stref)
-        #             continue
-        #         self.view.setItem(rows, i, QTableWidgetItem(_))
-        #
-        # self.last_row = self.view.rowCount()
-        # self.view.setRowCount(self.last_row + 1)
-        # for i in range(1, len(self.labels)):
-        #     self.view.setCellWidget(self.last_row, i, QLineEdit())
-        # self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
-        #
-        # self.view.resizeColumnsToContents()
-        # self.get_signal()
+        self.last_row = self.view.rowCount()
+        self.view.setRowCount(self.last_row + 1)
+        for i in range(1, len(self.labels)-3):
+            if i == 1:
+                lista = QComboBox(self)
+                ids = select_from_db("SELECT DISTINCT linie_id_linii FROM przystanki_w_linii ORDER BY 1;", conn)
+                # cur = conn.cursor()
+                # cur.execute("SELECT DISTINCT linie_id_linii FROM przystanki_w_linii ORDER BY 1;")
+                # ids = cur.fetchall()
+                # cur.close()
+                lista.addItem("")
+                for id in ids:
+                    lista.addItem(str(id[0]))
+                self.view.setCellWidget(self.last_row, i, lista)
+                continue
+            if i == 2:
+                self.set_kolejnosc(i)
+                continue
+            if i == 3:
+                daty = QTimeEdit(self)
+                daty.setCalendarPopup(True)
+                daty.setDisplayFormat(HOUR_FORMAT)
+                self.view.setCellWidget(self.last_row, i, daty)
+                continue
+            self.view.setCellWidget(self.last_row, i, QLineEdit())
+        self.view.setCellWidget(self.last_row, len(self.labels), self.push_button)
+
+        self.view.resizeColumnsToContents()
+        self.get_signal()
         self.setup(pos + 50, size, "Przyjazdy")
+        self.view.selectionModel().selectionChanged.connect(self.update_screen)
 
-    # def modify(self, item):
-    #     if item.data() == "Usuń":
-    #         try:
-    #             delete_from_db("przyjazdy", "id_przyjazdu", self.data[item.row()][0], self.conn)
-    #             self.close()
-    #         except (Exception, psycopg2.DatabaseError) as error:
-    #             print("Error: %s", error)
-    #             print("Cannot delete this record")
-    #             self.info_label.setText(str(error))
-    #             self.info_label.setVisible(True)
-    #             self.conn.rollback()
-    #     elif item.data() == "Modyfikuj":
-    #         try:
-    #             command = "UPDATE przyjazdy SET id_przyjazdu = " + self.view.item(item.row(), 0).text() + ", data_przyjazdu = '" + self.view.item(item.row(), 1).text() + "', " \
-    #                        "pwl_linie_id_linii = '" + self.view.cellWidget(item.row(), 2).currentText() + "', pwl_kolejnosc = '" + self.view.cellWidget(item.row(), 3).currentText() + "', " \
-    #                        "pwl_przystanki_id_przystanku = '" + self.view.cellWidget(item.row(), 4).currentText() + "', pwl_przystanki_nazwa_miasta = '" + self.view.cellWidget(item.row(), 5).currentText() + "', " \
-    #                        "strefy_typ_strefy = '" + self.view.cellWidget(item.row(), 6).currentText() + "' WHERE id_przyjazdu = " + str(self.data[item.row()][0]) + ";"
-    #             cur = self.conn.cursor()
-    #             print(command)
-    #             cur.execute(command)
-    #             self.conn.commit()
-    #             cur.close()
-    #             self.close()
-    #         except(Exception, psycopg2.DatabaseError) as error:
-    #             print(error)
-    #             self.info_label.setText(str(error))
-    #             self.info_label.setVisible(True)
-    #             self.conn.rollback()
-    #
-    # def add_to_db(self):
-    #     try:
-    #         item = self.view.cellWidget
-    #         row = self.last_row
-    #         command = "INSERT INTO przyjazdy VALUES(NEXTVAL('producer_seq'), '" + item(row, 3).currentText() + "', '" + item(row, 2).currentText() + "', '" + item(row, 4).currentText() + "', '" + item(row, 5).currentText() + "', '" + item(row, 0).text() + "', '" + item(row, 1).text() + "', '" + item(row, 6).currentText() + "');"
-    #         cur = self.conn.cursor()
-    #         print(command)
-    #         cur.execute(command)
-    #         self.conn.commit()
-    #         cur.close()
-    #         self.close()
-    #     except (Exception, psycopg2.DatabaseError) as error:
-    #         print(error)
-    #         self.info_label.setText(str(error))
-    #         self.info_label.setVisible(True)
-    #         self.conn.rollback()
+    def update_screen(self, selected, deselected):
+        for ix in selected.indexes():
+            if ix.column() == 2:
+                self.set_kolejnosc(2)
+                print(self.linia)
+
+    def set_kolejnosc(self, i):
+        lista = QComboBox(self)
+        self.linia = "null"
+        if self.view.cellWidget(self.last_row, 1).currentText() != "":
+            self.linia = self.view.cellWidget(self.last_row, 1).currentText()
+        ids = select_from_db("SELECT kolejnosc FROM przystanki_w_linii WHERE linie_id_linii = COALESCE("+ str(self.linia) + ", 0);")
+        # cur = self.conn.cursor()
+        # cur.execute("SELECT kolejnosc FROM przystanki_w_linii WHERE linie_id_linii = COALESCE("+ str(self.linia) + ", 0);")
+        # ids = cur.fetchall()
+        # cur.close()
+        lista.addItem("")
+        for id in ids:
+            lista.addItem(str(id[0]))
+        self.view.setCellWidget(self.last_row, i, lista)
+
+    def modify(self, item):
+        if item.data() == "Usuń":
+            try:
+                delete_from_db("przyjazdy", "id_przyjazdu", self.data[item.row()][0], self.conn)
+                self.close()
+            except (Exception, psycopg2.DatabaseError) as error:
+                print("Error: %s", error)
+                print("Cannot delete this record")
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
+                self.conn.rollback()
+        elif item.data() == "Modyfikuj":
+            try:
+                command = "UPDATE przyjazdy SET id_przyjazdu = " + self.view.item(item.row(), 0).text() + ", pwl_linie_id_linii = " + self.view.cellWidget(item.row(), 1).currentText() + ", " \
+                           "pwl_kolejnosc = " + self.view.cellWidget(item.row(), 2).currentText() + ", data_przyjazdu = to_timestamp('" + self.view.cellWidget(item.row(), 3).text() + "', 'HH24:MI:SS'), " \
+                           "pwl_przystanki_id_przystanku = " + self.view.cellWidget(item.row(), 4).currentText() + ", pwl_przystanki_nazwa_miasta = '" + self.view.cellWidget(item.row(), 5).currentText() + "', " \
+                           "strefy_typ_strefy = '" + self.view.item(item.row(), 6).currentText() + "' WHERE id_przyjazdu = " + str(self.data[item.row()][0]) + ";"
+                cur = self.conn.cursor()
+                print(command)
+                cur.execute(command)
+                self.conn.commit()
+                cur.close()
+                self.close()
+            except(Exception, psycopg2.DatabaseError) as error:
+                print(error)
+                self.info_label.setText(str(error))
+                self.info_label.setVisible(True)
+                self.conn.rollback()
+
+    def add_to_db(self):
+        try:
+            item = self.view.cellWidget
+            row = self.last_row
+            cur = self.conn.cursor()
+            cur.execute("SELECT przystanki_id_przystanku FROM przystanki_w_linii WHERE kolejnosc = " + item(row, 2).currentText() + " AND linie_id_linii = " + item(row, 1).currentText())
+            id_przys = cur.fetchone()[0]
+            print(id_przys)
+            command = "INSERT INTO przyjazdy VALUES(" + item(row, 2).currentText() + ", " + item(row, 1).currentText() + ", " + str(id_przys) + ", (SELECT miasta_nazwa_miasta FROM przystanki WHERE id_przystanku = " + str(id_przys) + "), " + \
+                      "NEXTVAL('przyjazd_seq'), to_timestamp('" + item(row, 3).text() + "', 'HH24:MI:SS'), (SELECT strefy_typ_strefy FROM przystanki WHERE id_przystanku = " + str(id_przys) + "));"
+            cur = self.conn.cursor()
+            print(command)
+            cur.execute(command)
+            self.conn.commit()
+            cur.close()
+            self.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+            self.info_label.setText(str(error))
+            self.info_label.setVisible(True)
+            self.conn.rollback()
 
 
 class Przystanki(FunctionWindow):
@@ -1321,7 +1357,7 @@ class Przystanki(FunctionWindow):
 
         self.conn = conn
         self.labels = ["ID przystanku", "Nazwa", "Adres", "Miasto", "Czy jest zajezdnią?", "ID biletomatu", "Strefa"]
-        self.data = select_from_db("*", "przystanki", self.conn)
+        self.data = select_from_db("SELECT * FROM przystanki;", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
@@ -1330,7 +1366,7 @@ class Przystanki(FunctionWindow):
             for i, _ in enumerate([str(item[0]), item[1], item[2], item[3], item[4], str(item[5]), item[6], "Modyfikuj", "Usuń"]):
                 if i == 3:
                     lista = QComboBox(self)
-                    ids = select_from_db("nazwa_miasta", "miasta", conn)
+                    ids = select_from_db("SELECT nazwa_miasta FROM miasta;", conn)
                     lista.addItem(_)
                     for id in ids:
                         if id[0] != _:
@@ -1351,7 +1387,7 @@ class Przystanki(FunctionWindow):
                         lista_bil.addItem('-')
                     else:
                         lista_bil.addItems([_, '-'])
-                    ids = select_from_db("id_biletomatu", "biletomaty", conn)
+                    ids = select_from_db("SELECT id_biletomatu FROm biletomaty;", conn)
                     for id in ids:
                         if str(id[0]) != _:
                             lista_bil.addItem(str(id[0]))
@@ -1372,7 +1408,7 @@ class Przystanki(FunctionWindow):
         for i in range(1, len(self.labels)):
             if i == 3:
                 lista = QComboBox(self)
-                ids = select_from_db("nazwa_miasta", "miasta", conn)
+                ids = select_from_db("SELECT nazwa_miasta FROM miasta;", conn)
                 lista.addItem("")
                 for item in ids:
                     lista.addItem(item[0])
@@ -1385,7 +1421,7 @@ class Przystanki(FunctionWindow):
                 continue
             if i == 5:
                 lista = QComboBox(self)
-                ids = select_from_db("id_biletomatu", "biletomaty", conn)
+                ids = select_from_db("SELECT id_biletomatu FROM biletomaty;", conn)
                 lista.addItem("")
                 for item in ids:
                     lista.addItem(str(item[0]))
@@ -1464,7 +1500,7 @@ class Strefy(FunctionWindow):
 
         self.conn = conn
         self.labels = ["Typ strefy"]
-        self.data = select_from_db("*", "strefy", self.conn)
+        self.data = select_from_db("SELECT * FROM strefy ORDER BY 1;", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
