@@ -484,7 +484,7 @@ class KierowcyPojazdy(FunctionWindow):
             for i, _ in enumerate([str(item[0]), str(item[1]), str(item[2]), str(item[3]), item[4], "Modyfikuj", "Usuń"]):
                 if i == 0:
                     lista_pojazdy = QComboBox(self)
-                    ids = select_from_db("SELECT id_pojazdu FROM pojazdy;", conn)
+                    ids = select_from_db("SELECT id_pojazdu FROM pojazdy ORDER BY 1;", conn)
                     lista_pojazdy.addItem(str(item[0]))
                     for id in ids:
                         if id[0] != item[0]:
@@ -493,7 +493,7 @@ class KierowcyPojazdy(FunctionWindow):
                     continue
                 if i == 4:
                     lista_pesele = QComboBox(self)
-                    pesele = select_from_db("SELECT pesel FROM kierowcy;", conn)
+                    pesele = select_from_db("SELECT pesel FROM kierowcy ORDER BY 1;", conn)
                     lista_pesele.addItem(item[4])
                     for id in pesele:
                         if id[0] != item[4]:
@@ -506,14 +506,14 @@ class KierowcyPojazdy(FunctionWindow):
         self.view.setRowCount(self.last_row + 1)
 
         lista_pojazdy = QComboBox(self)
-        ids = select_from_db("SELECT id_pojazdu FROM pojazdy;", conn)
+        ids = select_from_db("SELECT id_pojazdu FROM pojazdy ORDER BY 1;", conn)
         lista_pojazdy.addItem("")
         for item in ids:
             lista_pojazdy.addItem(str(item[0]))
         self.view.setCellWidget(self.last_row, 0, lista_pojazdy)
 
         lista_pesele = QComboBox(self)
-        pesele = select_from_db("SELECT pesel FROM kierowcy;", conn)
+        pesele = select_from_db("SELECT pesel FROM kierowcy ORDER BY 1;", conn)
         lista_pesele.addItem("")
         for item in pesele:
             lista_pesele.addItem(item[0])
@@ -596,7 +596,7 @@ class Kolejnosc(FunctionWindow):
             for i, _ in enumerate([str(item[0]), str(item[1]), str(item[2]), item[3], item[4], "Modyfikuj", "Usuń"]):
                 if i == 1:
                     lista = QComboBox(self)
-                    ids = select_from_db("SELECT id_linii FROM linie;", conn)
+                    ids = select_from_db("SELECT id_linii FROM linie ORDER BY 1;", conn)
                     lista.addItem(_)
                     for id in ids:
                         if str(id[0]) != _:
@@ -605,7 +605,7 @@ class Kolejnosc(FunctionWindow):
                     continue
                 if i == 2:
                     lista = QComboBox(self)
-                    ids = select_from_db("SELECT id_przystanku FROM przystanki;", conn)
+                    ids = select_from_db("SELECT id_przystanku FROM przystanki ORDER BY 1;", conn)
                     lista.addItem(_)
                     for id in ids:
                         if str(id[0]) != _:
@@ -620,7 +620,7 @@ class Kolejnosc(FunctionWindow):
         for i in range(0, len(self.labels)-2):
             if i == 1:
                 lista = QComboBox(self)
-                ids = select_from_db("SELECT id_linii FROM linie;", conn)
+                ids = select_from_db("SELECT id_linii FROM linie ORDER BY 1;", conn)
                 lista.addItem("")
                 for id in ids:
                     lista.addItem(str(id[0]))
@@ -628,7 +628,7 @@ class Kolejnosc(FunctionWindow):
                 continue
             if i == 2:
                 lista = QComboBox(self)
-                ids = select_from_db("SELECT id_przystanku FROM przystanki;", conn)
+                ids = select_from_db("SELECT id_przystanku FROM przystanki ORDER BY 1;", conn)
                 lista.addItem("")
                 for id in ids:
                     lista.addItem(str(id[0]))
@@ -701,7 +701,7 @@ class Linie(FunctionWindow):
 
         self.conn = conn
         self.labels = ["ID linii", "Typ linii"]
-        self.data = select_from_db("SELECT * FROM linie;", self.conn)
+        self.data = select_from_db("SELECT * FROM linie ORDER BY 1;", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
@@ -894,7 +894,7 @@ class Modele(FunctionWindow):
                 if i == 6:
                     lista = QComboBox(self)
                     lista.addItem(str(item[i]))
-                    ids = select_from_db("SELECT id_producenta FROM producenci;", conn)
+                    ids = select_from_db("SELECT id_producenta FROM producenci ORDER BY 1;", conn)
                     for id in ids:
                         if id[0] != item[i]:
                             lista.addItem(str(id[0]))
@@ -917,7 +917,7 @@ class Modele(FunctionWindow):
                 continue
             if i == 6:
                 lista = QComboBox(self)
-                ids = select_from_db("SELECT id_producenta FROM producenci;", conn)
+                ids = select_from_db("SELECT id_producenta FROM producenci ORDER BY 1;", conn)
                 lista.addItem("")
                 for item in ids:
                     lista.addItem(str(item[0]))
@@ -995,7 +995,7 @@ class Pojazdy(FunctionWindow):
                 if i == 2:
                     lista_linii = QComboBox(self)
                     lista_linii.addItem(str(item[i]))
-                    ids = select_from_db("SELECT id_linii FROM linie;", conn)
+                    ids = select_from_db("SELECT id_linii FROM linie ORDER BY 1;", conn)
                     for id in ids:
                         if id[0] != item[i]:
                             lista_linii.addItem(str(id[0]))
@@ -1007,7 +1007,7 @@ class Pojazdy(FunctionWindow):
                         lista_bil.addItem('-')
                     else:
                         lista_bil.addItems([_, '-'])
-                    ids = select_from_db("SELECT id_biletomatu FROM biletomaty;", conn)
+                    ids = select_from_db("SELECT id_biletomatu FROM biletomaty ORDER BY 1;", conn)
                     for id in ids:
                         if str(id[0]) != _:
                             lista_bil.addItem(str(id[0]))
@@ -1023,7 +1023,7 @@ class Pojazdy(FunctionWindow):
                 if i == 6:
                     lista = QComboBox(self)
                     lista.addItem(str(item[i]))
-                    ids = select_from_db("SELECT id_modelu FROm modele_pojazdow;", conn)
+                    ids = select_from_db("SELECT id_modelu FROM modele_pojazdow ORDER BY 1;", conn)
                     for id in ids:
                         if id[0] != item[i]:
                             lista.addItem(str(id[0]))
@@ -1036,7 +1036,7 @@ class Pojazdy(FunctionWindow):
         for i in range(2, len(self.labels)-1):
             if i == 2:
                 lista = QComboBox(self)
-                ids = select_from_db("SELECT id_linii FROM linie;", conn)
+                ids = select_from_db("SELECT id_linii FROM linie ORDER BY 1;", conn)
                 lista.addItem("")
                 for item in ids:
                     lista.addItem(str(item[0]))
@@ -1044,7 +1044,7 @@ class Pojazdy(FunctionWindow):
                 continue
             if i == 3:
                 lista = QComboBox(self)
-                ids = select_from_db("SELECT id_biletomatu FROM biletomaty;", conn)
+                ids = select_from_db("SELECT id_biletomatu FROM biletomaty ORDER BY 1;", conn)
                 lista.addItem("")
                 for item in ids:
                     lista.addItem(str(item[0]))
@@ -1059,7 +1059,7 @@ class Pojazdy(FunctionWindow):
                 continue
             if i == 6:
                 lista = QComboBox(self)
-                ids = select_from_db("SELECT id_modelu FROm modele_pojazdow;", conn)
+                ids = select_from_db("SELECT id_modelu FROm modele_pojazdow ORDER BY 1;", conn)
                 lista.addItem("")
                 for item in ids:
                     lista.addItem(str(item[0]))
@@ -1134,7 +1134,7 @@ class Producenci(FunctionWindow):
 
         self.conn = conn
         self.labels = ["ID producenta", "Nazwa"]
-        self.data = select_from_db("SELECT * FROM producenci;", self.conn)
+        self.data = select_from_db("SELECT * FROM producenci ORDER BY 1;", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
@@ -1212,7 +1212,7 @@ class Przyjazdy(FunctionWindow):
             for i, _ in enumerate([str(item[4]), str(item[1]), str(item[0]), str(item[5]), str(item[2]), item[3], item[6], "Modyfikuj", "Usuń"]):
                 if i == 1:
                     lista = QComboBox(self)
-                    ids = select_from_db("SELECT DISTINCT linie_id_linii FROM przystanki_w_linii;", conn)
+                    ids = select_from_db("SELECT DISTINCT linie_id_linii FROM przystanki_w_linii ORDER BY 1;", conn)
                     lista.addItem(_)
                     for id in ids:
                         if id[0] != _:
@@ -1221,7 +1221,7 @@ class Przyjazdy(FunctionWindow):
                     continue
                 if i == 2:
                     lista = QComboBox(self)
-                    ids = select_from_db("SELECT kolejnosc FROM przystanki_w_linii WHERE linie_id_linii = "+ str(item[1]) + ";", conn)
+                    ids = select_from_db("SELECT kolejnosc FROM przystanki_w_linii WHERE linie_id_linii = "+ str(item[1]) + " ORDER BY 1;", conn)
                     lista.addItem(_)
                     for id in ids:
                         if id[0] != _:
@@ -1353,7 +1353,7 @@ class Przystanki(FunctionWindow):
             for i, _ in enumerate([str(item[0]), item[1], item[2], item[3], item[4], str(item[5]), item[6], "Modyfikuj", "Usuń"]):
                 if i == 3:
                     lista = QComboBox(self)
-                    ids = select_from_db("SELECT nazwa_miasta FROM miasta;", conn)
+                    ids = select_from_db("SELECT nazwa_miasta FROM miasta ORDER BY 1;", conn)
                     lista.addItem(_)
                     for id in ids:
                         if id[0] != _:
@@ -1374,7 +1374,7 @@ class Przystanki(FunctionWindow):
                         lista_bil.addItem('-')
                     else:
                         lista_bil.addItems([_, '-'])
-                    ids = select_from_db("SELECT id_biletomatu FROm biletomaty;", conn)
+                    ids = select_from_db("SELECT id_biletomatu FROm biletomaty ORDER BY 1;", conn)
                     for id in ids:
                         if str(id[0]) != _:
                             lista_bil.addItem(str(id[0]))
@@ -1395,7 +1395,7 @@ class Przystanki(FunctionWindow):
         for i in range(1, len(self.labels)):
             if i == 3:
                 lista = QComboBox(self)
-                ids = select_from_db("SELECT nazwa_miasta FROM miasta;", conn)
+                ids = select_from_db("SELECT nazwa_miasta FROM miasta ORDER BY 1;", conn)
                 lista.addItem("")
                 for item in ids:
                     lista.addItem(item[0])
@@ -1408,7 +1408,7 @@ class Przystanki(FunctionWindow):
                 continue
             if i == 5:
                 lista = QComboBox(self)
-                ids = select_from_db("SELECT id_biletomatu FROM biletomaty;", conn)
+                ids = select_from_db("SELECT id_biletomatu FROM biletomaty ORDER BY 1;", conn)
                 lista.addItem("")
                 for item in ids:
                     lista.addItem(str(item[0]))
