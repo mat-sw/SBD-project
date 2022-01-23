@@ -5,13 +5,14 @@ from PyQt5.QtCore import Qt
 class FunctionWindow(QWidget):
     def __init__(self):
         super(FunctionWindow, self).__init__()
+        self.updatesEnabled()
 
     def add_buttons(self):
         self.push_button = QPushButton("Dodaj")
         self.push_button.setCheckable(True)
 
     def setup(self, pos, size, title):
-        self.setGeometry(pos[0], pos[1], size[0], size[1])
+        self.setGeometry(1920 / 2 - size[0] / 2, 1080 / 2 - size[1] / 2, size[0], size[1])
         self.setWindowTitle(title)
 
     def initialze_grid(self):

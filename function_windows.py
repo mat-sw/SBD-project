@@ -17,6 +17,11 @@ height = 600
 pos = np.array([1920 / 2 - width / 2, 1080 / 2 - height / 2])
 size = np.array([width, height])
 
+DELETE_ERROR = "Nie można usunąć rekordu. Jest on używany przez inną relację."
+UPDATE_ERROR_EXISTS = "Nie można zmienić pola,\nponieważ istnieje już taki klucz unikatowy."
+UPDATE_ERROR_VIOLATES = "Nie można zmienić identyfikującego relację atrybutu,\nponieważ jest on używany przez inną relację."
+INSERT_ERROR = "Niestety nie można wstawić nowego rekordu.\nSprawdź jeszcze raz dane."
+
 
 def connect_db():
     conn = None
@@ -69,7 +74,6 @@ class Biletomaty(FunctionWindow):
                     self.view.setCellWidget(rows, i, lista)
                     continue
                 self.view.setItem(rows, i, QTableWidgetItem(_))
-
         self.last_row = self.view.rowCount()
         self.view.setRowCount(self.last_row + 1)
         for i in range(1, 3):
@@ -80,7 +84,7 @@ class Biletomaty(FunctionWindow):
 
         self.view.resizeColumnsToContents()
         self.get_signal()
-        self.setup(pos + 50, size, "Biletomaty")
+        self.setup(pos + 50, [600, height], "Biletomaty")
 
     def modify(self, item):
         if item.data() == "Usuń":
@@ -90,7 +94,7 @@ class Biletomaty(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
-                self.info_label.setText(str(error))
+                self.info_label.setText(DELETE_ERROR)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
@@ -105,7 +109,10 @@ class Biletomaty(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
-                self.info_label.setText(str(error))
+                if 'already exists' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_EXISTS)
+                elif 'still referenced' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_VIOLATES)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
 
@@ -122,7 +129,7 @@ class Biletomaty(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
-            self.info_label.setText(str(error))
+            self.info_label.setText(INSERT_ERROR)
             self.info_label.setVisible(True)
             self.conn.rollback()
 
@@ -136,7 +143,7 @@ class Bilety(FunctionWindow):
         self.labels = ["ID Biletu", "Czy ulgowy?", "Cena", "Czas przejazdu", "Strefa"]
         self.data = select_from_db("SELECT * FROM bilety ORDER BY 1;", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
-        self.view.setHorizontalHeaderLabels(self.labels + [" ", " "])
+        self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
             rows = self.view.rowCount()
             self.view.setRowCount(rows + 1)
@@ -183,7 +190,7 @@ class Bilety(FunctionWindow):
 
         self.view.resizeColumnsToContents()
         self.get_signal()
-        self.setup(pos + 50, size, "Bilety")
+        self.setup(pos + 50, [600, height], "Bilety")
 
     def modify(self, item):
         if item.data() == "Usuń":
@@ -193,7 +200,7 @@ class Bilety(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
-                self.info_label.setText(str(error))
+                self.info_label.setText(DELETE_ERROR)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
@@ -208,7 +215,10 @@ class Bilety(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
-                self.info_label.setText(str(error))
+                if 'already exists' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_EXISTS)
+                elif 'still referenced' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_VIOLATES)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
 
@@ -225,7 +235,7 @@ class Bilety(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
-            self.info_label.setText(str(error))
+            self.info_label.setText(INSERT_ERROR)
             self.info_label.setVisible(True)
             self.conn.rollback()
 
@@ -236,7 +246,7 @@ class Kasy(FunctionWindow):
         self.initialze_grid()
 
         self.conn = conn
-        self.labels = ["ID Kasy", "Godzina otwarca", "Godzina zamknięcia", "ID przystanku", "Miasto", "Strefa"]
+        self.labels = ["ID Kasy", "Godzina otwarca", "Godzina zamknięcia", "Przystanek", "Miasto", "Strefa"]
         self.data = select_from_db("SELECT * FROM kasy_biletowe ORDER BY 1;", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
@@ -252,12 +262,14 @@ class Kasy(FunctionWindow):
                     self.view.setCellWidget(rows, i, daty)
                     continue
                 if i == 3:
+                    nazwa = select_from_db("SELECT nazwa_przystanku FROM przystanki WHERE id_przystanku = " + _ + ";", conn)
+                    nazwa = str(nazwa[0])[2:-3]
                     lista = QComboBox(self)
-                    ids = select_from_db("SELECT id_przystanku FROM przystanki ORDER BY 1;", conn)
-                    lista.addItem(_)
+                    ids = select_from_db("SELECT nazwa_przystanku FROM przystanki ORDER BY 1;", conn)
+                    lista.addItem(nazwa)
                     for id in ids:
-                        if str(id[0]) != _:
-                            lista.addItem(str(id[0]))
+                        if str(id[0]) != nazwa:
+                            lista.addItem(id[0])
                     self.view.setCellWidget(rows, i, lista)
                     continue
                 self.view.setItem(rows, i, QTableWidgetItem(_))
@@ -274,7 +286,7 @@ class Kasy(FunctionWindow):
                 continue
             if i == 3:
                 lista = QComboBox(self)
-                ids = select_from_db("SELECT id_przystanku FROM przystanki ORDER BY 1;", conn)
+                ids = select_from_db("SELECT nazwa_przystanku FROM przystanki ORDER BY 1;", conn)
                 lista.addItem("")
                 for id in ids:
                     lista.addItem(str(id[0]))
@@ -285,7 +297,7 @@ class Kasy(FunctionWindow):
 
         self.view.resizeColumnsToContents()
         self.get_signal()
-        self.setup(pos + 50, size, "Kasy biletowe")
+        self.setup(pos + 50, [800, height], "Kasy biletowe")
 
     def modify(self, item):
         if item.data() == "Usuń":
@@ -300,16 +312,16 @@ class Kasy(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
-                self.info_label.setText(str(error))
+                self.info_label.setText(DELETE_ERROR)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
                 id_przys = self.view.cellWidget(item.row(), 3).currentText()
                 command = "UPDATE kasy_biletowe SET id_kasy = " + self.view.item(item.row(), 0).text() + ", godzina_otwarcia = to_timestamp('" + self.view.cellWidget(item.row(), 1).text() + "', 'HH24:MI:SS'), " \
-                          "godzina_zamkniecia = to_timestamp('" + self.view.cellWidget(item.row(), 2).text() + "', 'HH24:MI:SS'), przystanki_id_przystanku = " + id_przys + ", "\
-                          "przystanki_miasta_nazwa_miasta = (SELECT miasta_nazwa_miasta FROM przystanki WHERE id_przystanku = " + id_przys + "), " \
-                          "przystanki_strefy_typ_strefy = (SELECT strefy_typ_strefy FROM przystanki WHERE id_przystanku = " + id_przys + ") WHERE id_kasy = " + str(self.data[item.row()][0]) + ";"
+                          "godzina_zamkniecia = to_timestamp('" + self.view.cellWidget(item.row(), 2).text() + "', 'HH24:MI:SS'), przystanki_id_przystanku = (SELECT id_przystanku FROM przystanki WHERE nazwa_przystanku = '" + id_przys + "', "\
+                          "przystanki_miasta_nazwa_miasta = (SELECT miasta_nazwa_miasta FROM przystanki WHERE nazwa_przystanku = '" + id_przys + "'), " \
+                          "przystanki_strefy_typ_strefy = (SELECT strefy_typ_strefy FROM przystanki WHERE nazwa_przystanku = '" + id_przys + "') WHERE id_kasy = " + str(self.data[item.row()][0]) + ";"
                 cur = self.conn.cursor()
                 print(command)
                 cur.execute(command)
@@ -318,16 +330,19 @@ class Kasy(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
-                self.info_label.setText(str(error))
+                if 'already exists' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_EXISTS)
+                elif 'still referenced' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_VIOLATES)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
 
     def add_to_db(self):
         try:
             item = self.view.cellWidget
-            command = "INSERT INTO kasy_biletowe VALUES(NEXTVAL('kasa_seq'), to_timestamp('" + item(self.last_row, 1).text() + "', 'HH24:MI:SS'), to_timestamp('" + item(self.last_row, 2).text() + "', 'HH24:MI:SS'), " + \
-                      item(self.last_row, 3).currentText() + ", (SELECT miasta_nazwa_miasta FROM przystanki WHERE id_przystanku = " + item(self.last_row, 3).currentText() + "), " \
-                      "(SELECT strefy_typ_strefy FROM przystanki WHERE id_przystanku = " + item(self.last_row, 3).currentText() + "));"
+            command = "INSERT INTO kasy_biletowe VALUES(NEXTVAL('kasa_seq'), to_timestamp('" + item(self.last_row, 1).text() + "', 'HH24:MI:SS'), to_timestamp('" + item(self.last_row, 2).text() + "', 'HH24:MI:SS'), " \
+                      "(SELECT id_przystanku FROM przystanki WHERE nazwa_przystanku = '" + item(self.last_row, 3).currentText() + "'), (SELECT miasta_nazwa_miasta FROM przystanki WHERE nazwa_przystanku = '" + item(self.last_row, 3).currentText() + "'), " \
+                      "(SELECT strefy_typ_strefy FROM przystanki WHERE nazwa_przystanku = '" + item(self.last_row, 3).currentText() + "'));"
             cur = self.conn.cursor()
             print(command)
             cur.execute(command)
@@ -336,7 +351,7 @@ class Kasy(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
-            self.info_label.setText(str(error))
+            self.info_label.setText(INSERT_ERROR)
             self.info_label.setVisible(True)
             self.conn.rollback()
 
@@ -418,7 +433,7 @@ class Kierowcy(FunctionWindow):
 
         self.view.resizeColumnsToContents()
         self.get_signal()
-        self.setup(pos + 50, size, "Kierowcy")
+        self.setup(pos + 50, [1520, height], "Kierowcy")
 
     def modify(self, item):
         if item.data() == "Usuń":
@@ -428,7 +443,7 @@ class Kierowcy(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
-                self.info_label.setText(str(error))
+                self.info_label.setText(DELETE_ERROR)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
@@ -445,7 +460,10 @@ class Kierowcy(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
-                self.info_label.setText(str(error))
+                if 'already exists' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_EXISTS)
+                elif 'still referenced' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_VIOLATES)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
 
@@ -463,7 +481,7 @@ class Kierowcy(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
-            self.info_label.setText(str(error))
+            self.info_label.setText(INSERT_ERROR)
             self.info_label.setVisible(True)
             self.conn.rollback()
 
@@ -523,7 +541,7 @@ class KierowcyPojazdy(FunctionWindow):
 
         self.view.resizeColumnsToContents()
         self.get_signal()
-        self.setup(pos + 50, size, "Kierowcy a pojazdy")
+        self.setup(pos + 50, [670, height], "Kierowcy a pojazdy")
 
     def modify(self, item):
         if item.data() == "Usuń":
@@ -538,7 +556,7 @@ class KierowcyPojazdy(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
-                self.info_label.setText(str(error))
+                self.info_label.setText(DELETE_ERROR)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
@@ -557,7 +575,10 @@ class KierowcyPojazdy(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
-                self.info_label.setText(str(error))
+                if 'already exists' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_EXISTS)
+                elif 'still referenced' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_VIOLATES)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
 
@@ -575,7 +596,7 @@ class KierowcyPojazdy(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
-            self.info_label.setText(str(error))
+            self.info_label.setText(INSERT_ERROR)
             self.info_label.setVisible(True)
             self.conn.rollback()
 
@@ -586,7 +607,7 @@ class Kolejnosc(FunctionWindow):
         self.initialze_grid()
 
         self.conn = conn
-        self.labels = ["Kolejnosc", "ID Linii", "ID przystanku", "Miasto", "Strefa"]
+        self.labels = ["Kolejnosc", "ID Linii", "Przystanek", "Miasto", "Strefa"]
         self.data = select_from_db("SELECT * FROM przystanki_w_linii ORDER BY 2, 1;", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
@@ -599,17 +620,19 @@ class Kolejnosc(FunctionWindow):
                     ids = select_from_db("SELECT id_linii FROM linie ORDER BY 1;", conn)
                     lista.addItem(_)
                     for id in ids:
-                        if str(id[0]) != _:
+                        if id[0] != item[i]:
                             lista.addItem(str(id[0]))
                     self.view.setCellWidget(rows, i, lista)
                     continue
                 if i == 2:
+                    nazwa = select_from_db("SELECT nazwa_przystanku FROM przystanki WHERE id_przystanku = '" + _ + "';", conn)
+                    nazwa = str(nazwa[0])[2:-3]
                     lista = QComboBox(self)
-                    ids = select_from_db("SELECT id_przystanku FROM przystanki ORDER BY 1;", conn)
-                    lista.addItem(_)
+                    ids = select_from_db("SELECT nazwa_przystanku FROM przystanki ORDER BY 1;", conn)
+                    lista.addItem(nazwa)
                     for id in ids:
-                        if str(id[0]) != _:
-                            lista.addItem(str(id[0]))
+                        if id[0] != nazwa:
+                            lista.addItem(id[0])
                     self.view.setCellWidget(rows, i, lista)
                     continue
                 self.view.setItem(rows, i, QTableWidgetItem(_))
@@ -628,10 +651,10 @@ class Kolejnosc(FunctionWindow):
                 continue
             if i == 2:
                 lista = QComboBox(self)
-                ids = select_from_db("SELECT id_przystanku FROM przystanki ORDER BY 1;", conn)
+                ids = select_from_db("SELECT nazwa_przystanku FROM przystanki ORDER BY 1;", conn)
                 lista.addItem("")
                 for id in ids:
-                    lista.addItem(str(id[0]))
+                    lista.addItem(id[0])
                 self.view.setCellWidget(self.last_row, i, lista)
                 continue
             self.view.setCellWidget(self.last_row, i, QLineEdit())
@@ -639,7 +662,7 @@ class Kolejnosc(FunctionWindow):
 
         self.view.resizeColumnsToContents()
         self.get_signal()
-        self.setup(pos + 50, size, "kolejność przystanków")
+        self.setup(pos + 50, [670, height], "kolejność przystanków")
 
     def modify(self, item):
         if item.data() == "Usuń":
@@ -654,15 +677,15 @@ class Kolejnosc(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
-                self.info_label.setText(str(error))
+                self.info_label.setText(DELETE_ERROR)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
                 id_przys = self.view.cellWidget(item.row(), 2).currentText()
                 command = "UPDATE przystanki_w_linii SET kolejnosc = " + self.view.item(item.row(), 0).text() + ", linie_id_linii = " + self.view.cellWidget(item.row(), 1).currentText() + ", " \
-                          "przystanki_id_przystanku = "+ id_przys + ", przystanki_miasta_nazwa_miasta = (SELECT miasta_nazwa_miasta FROM przystanki WHERE id_przystanku = " + id_przys + "), " \
-                          "przystanki_strefy_typ_strefy = (SELECT strefy_typ_strefy FROM przystanki WHERE id_przystanku = " + id_przys + ") WHERE kolejnosc = " + str(self.data[item.row()][0]) + "AND linie_id_linii = " + str(self.data[item.row()][1]) + ";"
+                          "przystanki_id_przystanku = (SELECT id_przystanku FROM przystanki WHERE nazwa_przystanku = '"+ id_przys + "'), przystanki_miasta_nazwa_miasta = (SELECT miasta_nazwa_miasta FROM przystanki WHERE nazwa_przystanku = '" + id_przys + "'), " \
+                          "przystanki_strefy_typ_strefy = (SELECT strefy_typ_strefy FROM przystanki WHERE nazwa_przystanku = '" + id_przys + "') WHERE kolejnosc = " + str(self.data[item.row()][0]) + "AND linie_id_linii = " + str(self.data[item.row()][1]) + ";"
                 cur = self.conn.cursor()
                 print(command)
                 cur.execute(command)
@@ -671,7 +694,10 @@ class Kolejnosc(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
-                self.info_label.setText(str(error))
+                if 'already exists' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_EXISTS)
+                elif 'still referenced' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_VIOLATES)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
 
@@ -679,8 +705,8 @@ class Kolejnosc(FunctionWindow):
         try:
             item = self.view.cellWidget
             id_przys = item(self.last_row, 2).currentText()
-            command = "INSERT INTO przystanki_w_linii VALUES("+ item(self.last_row, 0).text() + ", " + item(self.last_row, 1).currentText() + ", " + id_przys + ", " + \
-                      "(SELECT miasta_nazwa_miasta FROM przystanki WHERE id_przystanku = " + id_przys + "), (SELECT strefy_typ_strefy FROM przystanki WHERE id_przystanku = " + id_przys + "));"
+            command = "INSERT INTO przystanki_w_linii VALUES("+ item(self.last_row, 0).text() + ", " + item(self.last_row, 1).currentText() + ", (SELECT id_przystanku FROM przystanki WHERE nazwa_przystanku = '" + id_przys + "'), " + \
+                      "(SELECT miasta_nazwa_miasta FROM przystanki WHERE nazwa_przystanku = '" + id_przys + "'), (SELECT strefy_typ_strefy FROM przystanki WHERE nazwa_przystanku = '" + id_przys + "'));"
             cur = self.conn.cursor()
             print(command)
             cur.execute(command)
@@ -689,7 +715,7 @@ class Kolejnosc(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
-            self.info_label.setText(str(error))
+            self.info_label.setText(INSERT_ERROR)
             self.info_label.setVisible(True)
             self.conn.rollback()
 
@@ -731,7 +757,7 @@ class Linie(FunctionWindow):
         self.view.resizeColumnsToContents()
         self.get_signal()
 
-        self.setup(pos + 50, size, "Linie")
+        self.setup(pos + 50, [500, height], "Linie")
 
     def modify(self, item):
         if item.data() == "Usuń":
@@ -741,7 +767,7 @@ class Linie(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
-                self.info_label.setText(str(error))
+                self.info_label.setText(DELETE_ERROR)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
@@ -755,7 +781,10 @@ class Linie(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
-                self.info_label.setText(str(error))
+                if 'already exists' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_EXISTS)
+                elif 'still referenced' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_VIOLATES)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
 
@@ -770,7 +799,7 @@ class Linie(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
-            self.info_label.setText(str(error))
+            self.info_label.setText(INSERT_ERROR)
             self.info_label.setVisible(True)
             self.conn.rollback()
 
@@ -813,7 +842,7 @@ class Miasta(FunctionWindow):
         self.view.resizeColumnsToContents()
         self.get_signal()
 
-        self.setup(pos + 50, size, "Miasta")
+        self.setup(pos + 50, [900, height], "Miasta")
 
     def modify(self, item):
         if item.data() == "Usuń":
@@ -823,7 +852,7 @@ class Miasta(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
-                self.info_label.setText(str(error))
+                self.info_label.setText(DELETE_ERROR)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
@@ -838,7 +867,10 @@ class Miasta(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
-                self.info_label.setText(str(error))
+                if 'already exists' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_EXISTS)
+                elif 'still referenced' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_VIOLATES)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
 
@@ -856,7 +888,7 @@ class Miasta(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
-            self.info_label.setText(str(error))
+            self.info_label.setText(INSERT_ERROR)
             self.info_label.setVisible(True)
             self.conn.rollback()
 
@@ -867,7 +899,7 @@ class Modele(FunctionWindow):
         self.initialze_grid()
 
         self.conn = conn
-        self.labels = ["ID Modelu", "Nazwa Modelu", "Typ pojazdu", "Czy niskopodłogowy", "Miejsca siedzące", "Miejsca stojące", "ID producenta"]
+        self.labels = ["ID Modelu", "Nazwa Modelu", "Typ pojazdu", "Czy niskopodłogowy", "Miejsca siedzące", "Miejsca stojące", "Producent"]
         self.data = select_from_db("SELECT * FROM modele_pojazdow ORDER BY 1;", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
@@ -892,12 +924,14 @@ class Modele(FunctionWindow):
                     self.view.setCellWidget(rows, i, lista)
                     continue
                 if i == 6:
+                    nazwa = select_from_db("SELECT nazwa_producenta FROM producenci WHERE id_producenta = " + _ + ";", conn)
+                    nazwa = str(nazwa[0])[2:-3]
                     lista = QComboBox(self)
-                    lista.addItem(str(item[i]))
-                    ids = select_from_db("SELECT id_producenta FROM producenci ORDER BY 1;", conn)
+                    lista.addItem(nazwa)
+                    ids = select_from_db("SELECT nazwa_producenta FROM producenci ORDER BY 1;", conn)
                     for id in ids:
-                        if id[0] != item[i]:
-                            lista.addItem(str(id[0]))
+                        if id[0] != nazwa:
+                            lista.addItem(id[0])
                     self.view.setCellWidget(rows, i, lista)
                     continue
                 self.view.setItem(rows, i, QTableWidgetItem(_))
@@ -917,10 +951,10 @@ class Modele(FunctionWindow):
                 continue
             if i == 6:
                 lista = QComboBox(self)
-                ids = select_from_db("SELECT id_producenta FROM producenci ORDER BY 1;", conn)
+                ids = select_from_db("SELECT nazwa_producenta FROM producenci ORDER BY 1;", conn)
                 lista.addItem("")
                 for item in ids:
-                    lista.addItem(str(item[0]))
+                    lista.addItem(item[0])
                 self.view.setCellWidget(self.last_row, i, lista)
                 continue
             self.view.setCellWidget(self.last_row, i, QLineEdit())
@@ -929,7 +963,7 @@ class Modele(FunctionWindow):
         self.view.resizeColumnsToContents()
         self.get_signal()
 
-        self.setup(pos + 50, size, "Modele")
+        self.setup(pos + 50, [1200, height], "Modele")
 
     def modify(self, item):
         if item.data() == "Usuń":
@@ -939,14 +973,14 @@ class Modele(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
-                self.info_label.setText(str(error))
+                self.info_label.setText(DELETE_ERROR)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
                 command = "UPDATE modele_pojazdow SET id_modelu = " + self.view.item(item.row(), 0).text() + ", nazwa_modelu = '" + self.view.item(item.row(), 1).text() + "', typ_pojazdu = '" + self.view.cellWidget(item.row(), 2).currentText() + "', " \
-                                                                                                                                                                                                                                                      "czy_niskopodlogowy = '" + self.view.cellWidget(item.row(), 3).currentText() + "', liczba_miejsc_siedzacych = " + self.view.item(item.row(), 4).text() + ", " \
-                                                                                                                                                                                                                                                                                                                                                                                                               "liczba_miejsc_stojacych = " + self.view.item(item.row(), 5).text() + ", producenci_id_producenta = " + self.view.cellWidget(item.row(), 6).currentText() + " WHERE id_modelu = '" + str(self.data[item.row()][0]) + "';"
+                "czy_niskopodlogowy = '" + self.view.cellWidget(item.row(), 3).currentText() + "', liczba_miejsc_siedzacych = " + self.view.item(item.row(), 4).text() + ", " \
+                "liczba_miejsc_stojacych = " + self.view.item(item.row(), 5).text() + ", producenci_id_producenta = (SELECT id_producenta FROM producenci WHERE nazwa_producenta = '" + self.view.cellWidget(item.row(), 6).currentText() + "') WHERE id_modelu = '" + str(self.data[item.row()][0]) + "';"
                 cur = self.conn.cursor()
                 print(command)
                 cur.execute(command)
@@ -955,7 +989,10 @@ class Modele(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
-                self.info_label.setText(str(error))
+                if 'already exists' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_EXISTS)
+                elif 'still referenced' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_VIOLATES)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
 
@@ -964,7 +1001,7 @@ class Modele(FunctionWindow):
             item = self.view.cellWidget
             row = self.last_row
             command = "INSERT INTO modele_pojazdow VALUES(NEXTVAL('model_seq'), '" + item(row, 1).text() + "', '" + item(row, 2).currentText() + "', '" + \
-                      item(row, 3).currentText() + "', " + item(row, 4).text() + ", " + item(row, 5).text() + ", " + item(row, 6).currentText() + ");"
+            item(row, 3).currentText() + "', " + item(row, 4).text() + ", " + item(row, 5).text() + ", (SELECT id_producenta FROm producenci WHERE nazwa_producenta = '" + item(row, 6).currentText() + "'));"
             cur = self.conn.cursor()
             print(command)
             cur.execute(command)
@@ -973,7 +1010,7 @@ class Modele(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
-            self.info_label.setText(str(error))
+            self.info_label.setText(INSERT_ERROR)
             self.info_label.setVisible(True)
             self.conn.rollback()
 
@@ -984,7 +1021,7 @@ class Pojazdy(FunctionWindow):
         self.initialze_grid()
 
         self.conn = conn
-        self.labels = ["ID pojazdu", "Max liczba osob", "ID Linii", "ID biletomatu", "Rok produkcji", "Data waznosci przegladu", "ID modelu", "ID producenta"]
+        self.labels = ["ID pojazdu", "Max liczba osob", "ID Linii", "ID biletomatu", "Rok produkcji", "Data waznosci przegladu", "Model", "ID Producenta"]
         self.data = select_from_db("SELECT * FROM pojazdy ORDER BY 1;", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
@@ -1021,12 +1058,14 @@ class Pojazdy(FunctionWindow):
                     self.view.setCellWidget(rows, i, daty)
                     continue
                 if i == 6:
+                    nazwa = select_from_db("SELECT nazwa_modelu FROM modele_pojazdow WHERE id_modelu = " + _ + ";", conn)
+                    nazwa = str(nazwa[0])[2:-3]
                     lista = QComboBox(self)
-                    lista.addItem(str(item[i]))
-                    ids = select_from_db("SELECT id_modelu FROM modele_pojazdow ORDER BY 1;", conn)
+                    lista.addItem(nazwa)
+                    ids = select_from_db("SELECT nazwa_modelu FROM modele_pojazdow ORDER BY 1;", conn)
                     for id in ids:
-                        if id[0] != item[i]:
-                            lista.addItem(str(id[0]))
+                        if id[0] != nazwa:
+                            lista.addItem(id[0])
                     self.view.setCellWidget(rows, i, lista)
                     continue
                 self.view.setItem(rows, i, QTableWidgetItem(_))
@@ -1059,10 +1098,10 @@ class Pojazdy(FunctionWindow):
                 continue
             if i == 6:
                 lista = QComboBox(self)
-                ids = select_from_db("SELECT id_modelu FROm modele_pojazdow ORDER BY 1;", conn)
+                ids = select_from_db("SELECT nazwa_modelu FROM modele_pojazdow ORDER BY 1;", conn)
                 lista.addItem("")
                 for item in ids:
-                    lista.addItem(str(item[0]))
+                    lista.addItem(item[0])
                 self.view.setCellWidget(self.last_row, i, lista)
                 continue
             self.view.setCellWidget(self.last_row, i, QLineEdit())
@@ -1071,7 +1110,7 @@ class Pojazdy(FunctionWindow):
         self.view.resizeColumnsToContents()
         self.get_signal()
 
-        self.setup(pos + 50, size, "Pojazdy")
+        self.setup(pos + 50, [1150, height], "Pojazdy")
 
     def modify(self, item):
         if item.data() == "Usuń":
@@ -1081,18 +1120,19 @@ class Pojazdy(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
-                self.info_label.setText(str(error))
+                self.info_label.setText(DELETE_ERROR)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
             try:
                 bil = self.view.cellWidget(item.row(), 3).currentText()
+                n_mod = self.view.cellWidget(item.row(), 6).currentText()
                 if bil in ["None", "-"]:
                     bil = "null"
-                command = "UPDATE pojazdy SET id_pojazdu = " + self.view.item(item.row(), 0).text() + ", max_liczba_osob = (SELECT sum_sits("+ self.view.cellWidget(item.row(), 6).currentText() + ")), " \
-                                                                                                                                                                                                   "linie_id_linii = " + self.view.cellWidget(item.row(), 2).currentText() + ", biletomaty_id_biletomatu = " + bil + ", rok_produkcji = " + self.view.item(item.row(), 4).text() + \
-                          ", data_waznosci_przegladu = to_date('" + self.view.cellWidget(item.row(), 5).text() + "', 'YYYY-MM-DD'), modele_poj_id_modelu = " + self.view.cellWidget(item.row(), 6).currentText() + \
-                          ", modele_poj_prod_id_producenta = " + self.view.item(item.row(), 7).text() + " WHERE id_pojazdu = " + str(self.data[item.row()][0]) + ";"
+                command = "UPDATE pojazdy SET id_pojazdu = " + self.view.item(item.row(), 0).text() + ", max_liczba_osob = (SELECT sum_sits((SELECT id_modelu FROM modele_pojazdow WHERE nazwa_modelu = '" + n_mod + "'))), " \
+                "linie_id_linii = " + self.view.cellWidget(item.row(), 2).currentText() + ", biletomaty_id_biletomatu = " + bil + ", rok_produkcji = " + self.view.item(item.row(), 4).text() + \
+                ", data_waznosci_przegladu = to_date('" + self.view.cellWidget(item.row(), 5).text() + "', 'YYYY-MM-DD'), modele_poj_id_modelu = (SELECT id_modelu FROM modele_pojazdow WHERE nazwa_modelu = '" + n_mod + \
+                "'), modele_poj_prod_id_producenta = (SELECT producenci_id_producenta FROM modele_pojazdow WHERE nazwa_modelu = '" + n_mod + "') WHERE id_pojazdu = " + str(self.data[item.row()][0]) + ";"
                 cur = self.conn.cursor()
                 print(command)
                 cur.execute(command)
@@ -1101,7 +1141,10 @@ class Pojazdy(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
-                self.info_label.setText(str(error))
+                if 'already exists' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_EXISTS)
+                elif 'still referenced' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_VIOLATES)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
 
@@ -1111,10 +1154,11 @@ class Pojazdy(FunctionWindow):
             row = self.last_row
             cur = self.conn.cursor()
             bil = item(row, 3).currentText()
+            n_mod = item(row, 6).currentText()
             if bil == '':
                 bil = "null"
-            command = "INSERT INTO pojazdy VALUES(NEXTVAL('pojazd_seq'), (SELECT sum_sits("+ item(row, 6).currentText() + ")), "+ item(row, 2).currentText() +", "+ bil +", "+ item(row, 4).text() + \
-                      ", to_date('"+ item(row, 5).text() +"', 'YYYY-MM-DD'), "+ item(row, 6).currentText() +", (SELECT producenci_id_producenta FROM modele_pojazdow WHERE id_modelu = "+ item(row, 6).currentText() +"));"
+            command = "INSERT INTO pojazdy VALUES(NEXTVAL('pojazd_seq'), (SELECT sum_sits((SELECT id_modelu FROM modele_pojazdow WHERE nazwa_modelu = '" + n_mod + "'))), "+ item(row, 2).currentText() +", "+ bil +", "+ item(row, 4).text() + \
+                      ", to_date('"+ item(row, 5).text() +"', 'YYYY-MM-DD'), (SELECT id_modelu FROM modele_pojazdow WHERE nazwa_modelu = '"+ item(row, 6).currentText() +"'), (SELECT producenci_id_producenta FROM modele_pojazdow WHERE nazwa_modelu = '"+ item(row, 6).currentText() +"'));"
             print(command)
             cur.execute(command)
             self.conn.commit()
@@ -1122,7 +1166,7 @@ class Pojazdy(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
-            self.info_label.setText(str(error))
+            self.info_label.setText(INSERT_ERROR)
             self.info_label.setVisible(True)
             self.conn.rollback()
 
@@ -1151,7 +1195,7 @@ class Producenci(FunctionWindow):
 
         self.view.resizeColumnsToContents()
         self.get_signal()
-        self.setup(pos + 50, size, "Producenci")
+        self.setup(pos + 50, [500, height], "Producenci")
 
     def modify(self, item):
         if item.data() == "Usuń":
@@ -1161,7 +1205,7 @@ class Producenci(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
-                self.info_label.setText(str(error))
+                self.info_label.setText(DELETE_ERROR)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
@@ -1175,7 +1219,10 @@ class Producenci(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
-                self.info_label.setText(str(error))
+                if 'already exists' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_EXISTS)
+                elif 'still referenced' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_VIOLATES)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
 
@@ -1192,7 +1239,7 @@ class Producenci(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
-            self.info_label.setText(str(error))
+            self.info_label.setText(INSERT_ERROR)
             self.info_label.setVisible(True)
             self.conn.rollback()
 
@@ -1215,7 +1262,7 @@ class Przyjazdy(FunctionWindow):
                     ids = select_from_db("SELECT DISTINCT linie_id_linii FROM przystanki_w_linii ORDER BY 1;", conn)
                     lista.addItem(_)
                     for id in ids:
-                        if id[0] != _:
+                        if id[0] != item[1]:
                             lista.addItem(str(id[0]))
                     self.view.setCellWidget(rows, i, lista)
                     continue
@@ -1224,7 +1271,7 @@ class Przyjazdy(FunctionWindow):
                     ids = select_from_db("SELECT kolejnosc FROM przystanki_w_linii WHERE linie_id_linii = "+ str(item[1]) + " ORDER BY 1;", conn)
                     lista.addItem(_)
                     for id in ids:
-                        if id[0] != _:
+                        if id[0] != item[i]:
                             lista.addItem(str(id[0]))
                     self.view.setCellWidget(rows, i, lista)
                     continue
@@ -1262,7 +1309,7 @@ class Przyjazdy(FunctionWindow):
 
         self.view.resizeColumnsToContents()
         self.get_signal()
-        self.setup(pos + 50, size, "Przyjazdy")
+        self.setup(pos + 50, [850, height], "Przyjazdy")
         self.view.selectionModel().selectionChanged.connect(self.update_screen)
 
     def update_screen(self, selected, deselected):
@@ -1276,7 +1323,7 @@ class Przyjazdy(FunctionWindow):
         self.linia = "null"
         if self.view.cellWidget(self.last_row, 1).currentText() != "":
             self.linia = self.view.cellWidget(self.last_row, 1).currentText()
-        ids = select_from_db("SELECT kolejnosc FROM przystanki_w_linii WHERE linie_id_linii = COALESCE("+ str(self.linia) + ", 0);", self.conn)
+        ids = select_from_db("SELECT kolejnosc FROM przystanki_w_linii WHERE linie_id_linii = COALESCE("+ str(self.linia) + ", 0) ORDER BY 1;", self.conn)
         lista.addItem("")
         for id in ids:
             lista.addItem(str(id[0]))
@@ -1290,7 +1337,7 @@ class Przyjazdy(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
-                self.info_label.setText(str(error))
+                self.info_label.setText(DELETE_ERROR)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
@@ -1299,9 +1346,9 @@ class Przyjazdy(FunctionWindow):
                 cur.execute("SELECT przystanki_id_przystanku FROM przystanki_w_linii WHERE kolejnosc = " + self.view.cellWidget(item.row(), 2).currentText() + " AND linie_id_linii = " + self.view.cellWidget(item.row(), 1).currentText() + ";")
                 id_przys = cur.fetchone()[0]
                 command = "UPDATE przyjazdy SET id_przyjazdu = " + self.view.item(item.row(), 0).text() + ", pwl_linie_id_linii = " + self.view.cellWidget(item.row(), 1).currentText() + ", " \
-                            "pwl_kolejnosc = " + self.view.cellWidget(item.row(), 2).currentText() + ", data_przyjazdu = to_timestamp('" + self.view.cellWidget(item.row(), 3).text() + "', 'HH24:MI:SS'), " \
-                            "pwl_przystanki_id_przystanku = " + str(id_przys) + ", pwl_przystanki_nazwa_miasta = (SELECT miasta_nazwa_miasta FROM przystanki WHERE id_przystanku = " + str(id_przys) + "), " \
-                            "pwl_przyst_strefy_typ_strefy = (SELECT strefy_typ_strefy FROM przystanki WHERE id_przystanku = " + str(id_przys) + ") WHERE id_przyjazdu = " + str(self.data[item.row()][4]) + ";"
+                          "pwl_kolejnosc = " + self.view.cellWidget(item.row(), 2).currentText() + ", data_przyjazdu = to_timestamp('" + self.view.cellWidget(item.row(), 3).text() + "', 'HH24:MI:SS'), " \
+                          "pwl_przystanki_id_przystanku = " + str(id_przys) + ", pwl_przystanki_nazwa_miasta = (SELECT miasta_nazwa_miasta FROM przystanki WHERE id_przystanku = " + str(id_przys) + "), " \
+                          "pwl_przyst_strefy_typ_strefy = (SELECT strefy_typ_strefy FROM przystanki WHERE id_przystanku = " + str(id_przys) + ") WHERE id_przyjazdu = " + str(self.data[item.row()][4]) + ";"
                 cur = self.conn.cursor()
                 print(command)
                 cur.execute(command)
@@ -1310,7 +1357,10 @@ class Przyjazdy(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
-                self.info_label.setText(str(error))
+                if 'already exists' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_EXISTS)
+                elif 'still referenced' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_VIOLATES)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
 
@@ -1332,7 +1382,7 @@ class Przyjazdy(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
-            self.info_label.setText(str(error))
+            self.info_label.setText(INSERT_ERROR)
             self.info_label.setVisible(True)
             self.conn.rollback()
 
@@ -1424,7 +1474,7 @@ class Przystanki(FunctionWindow):
 
         self.view.resizeColumnsToContents()
         self.get_signal()
-        self.setup(pos + 50, size, "Przystanki")
+        self.setup(pos + 50, [1150, height], "Przystanki")
 
     def modify(self, item):
         if item.data() == "Usuń":
@@ -1434,7 +1484,7 @@ class Przystanki(FunctionWindow):
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
                 print("Cannot delete this record")
-                self.info_label.setText(str(error))
+                self.info_label.setText(DELETE_ERROR)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
@@ -1443,9 +1493,9 @@ class Przystanki(FunctionWindow):
                 if bil in ["None", "-"]:
                     bil = "null"
                 command = "UPDATE przystanki SET id_przystanku = " + self.view.item(item.row(), 0).text() + ", nazwa_przystanku = '" + self.view.item(item.row(), 1).text() + "', " \
-                           "adres = '" + self.view.item(item.row(), 2).text() + "', miasta_nazwa_miasta = '" + self.view.cellWidget(item.row(), 3).currentText() + "', " \
-                           "czy_zajezdnia = '" + self.view.cellWidget(item.row(), 4).currentText() + "', biletomaty_id_biletomatu = " + bil + ", " \
-                           "strefy_typ_strefy = '" + self.view.cellWidget(item.row(), 6).currentText() + "' WHERE id_przystanku = " + str(self.data[item.row()][0]) + ";"
+                "adres = '" + self.view.item(item.row(), 2).text() + "', miasta_nazwa_miasta = '" + self.view.cellWidget(item.row(), 3).currentText() + "', " \
+                "czy_zajezdnia = '" + self.view.cellWidget(item.row(), 4).currentText() + "', biletomaty_id_biletomatu = " + bil + ", " \
+                "strefy_typ_strefy = '" + self.view.cellWidget(item.row(), 6).currentText() + "' WHERE id_przystanku = " + str(self.data[item.row()][0]) + ";"
                 cur = self.conn.cursor()
                 print(command)
                 cur.execute(command)
@@ -1454,7 +1504,10 @@ class Przystanki(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
-                self.info_label.setText(str(error))
+                if 'already exists' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_EXISTS)
+                elif 'still referenced' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_VIOLATES)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
 
@@ -1475,7 +1528,7 @@ class Przystanki(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
-            self.info_label.setText(str(error))
+            self.info_label.setText(INSERT_ERROR)
             self.info_label.setVisible(True)
             self.conn.rollback()
 
@@ -1511,7 +1564,7 @@ class Strefy(FunctionWindow):
 
         self.view.resizeColumnsToContents()
         self.get_signal()
-        self.setup(pos + 50, size, "Strefy")
+        self.setup(pos + 50, [280, height/2], "Strefy")
 
     def modify(self, item):
         if item.data() == "Usuń":
@@ -1520,8 +1573,8 @@ class Strefy(FunctionWindow):
                 self.close()
             except (Exception, psycopg2.DatabaseError) as error:
                 print("Error: %s", error)
-                print("Cannot delete this record")
-                self.info_label.setText(str(error))
+                print(DELETE_ERROR)
+                self.info_label.setText(DELETE_ERROR)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
         elif item.data() == "Modyfikuj":
@@ -1535,7 +1588,10 @@ class Strefy(FunctionWindow):
                 self.close()
             except(Exception, psycopg2.DatabaseError) as error:
                 print(error)
-                self.info_label.setText(str(error))
+                if 'already exists' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_EXISTS)
+                elif 'still referenced' in str(error):
+                    self.info_label.setText(UPDATE_ERROR_VIOLATES)
                 self.info_label.setVisible(True)
                 self.conn.rollback()
 
@@ -1549,6 +1605,6 @@ class Strefy(FunctionWindow):
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
-            self.info_label.setText(str(error))
+            self.info_label.setText(INSERT_ERROR)
             self.info_label.setVisible(True)
             self.conn.rollback()
