@@ -181,6 +181,7 @@ class Bilety(FunctionWindow):
         lista_tak_nie.addItems(['', 'tak', 'nie'])
         self.view.setCellWidget(self.last_row, 1, lista_tak_nie)
         lista_czas = QComboBox(self)
+        self.view.setCellWidget(self.last_row, 2, QLineEdit())
         lista_czas.addItems(['', '15', '30', '60'])
         self.view.setCellWidget(self.last_row, 3, lista_czas)
         lista_strefy = QComboBox(self)
@@ -190,7 +191,7 @@ class Bilety(FunctionWindow):
 
         self.view.resizeColumnsToContents()
         self.get_signal()
-        self.setup(pos + 50, [600, height], "Bilety")
+        self.setup(pos + 50, [700, height], "Bilety")
 
     def modify(self, item):
         if item.data() == "Usuń":
@@ -226,7 +227,7 @@ class Bilety(FunctionWindow):
         try:
             item = self.view.cellWidget
             row = self.last_row
-            command = "INSERT INTO bilety VALUES(NEXTVAL('bilet_seq'), '" + item(row, 1).currentText() + "', 0, '" + item(row, 3).currentText() + "', '" + item(row, 4).currentText() + "');"
+            command = "INSERT INTO bilety VALUES(NEXTVAL('bilet_seq'), '" + item(row, 1).currentText() + "', " + item(row, 2).text() + ", '" + item(row, 3).currentText() + "', '" + item(row, 4).currentText() + "');"
             cur = self.conn.cursor()
             print(command)
             cur.execute(command)
@@ -1394,7 +1395,7 @@ class Przystanki(FunctionWindow):
 
         self.conn = conn
         self.labels = ["ID przystanku", "Nazwa", "Adres", "Miasto", "Czy jest zajezdnią?", "ID biletomatu", "Strefa"]
-        self.data = select_from_db("SELECT * FROM przystanki;", self.conn)
+        self.data = select_from_db("SELECT * FROM przystanki ORDER BY 1;", self.conn)
         self.view.setColumnCount(len(self.labels) + 2)
         self.view.setHorizontalHeaderLabels(self.labels + ["", ""])
         for item in self.data:
